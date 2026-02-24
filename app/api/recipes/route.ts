@@ -27,29 +27,56 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Failed to fetch URL" }, { status: 400 });
   }
-
   const $ = cheerio.load(html);
 
-  const title = $("title").first().text().trim() || "Untitled Recipe";
-
-  const ingredientSelectors = [
-    '[class*="ingredient"]',
-    '[itemprop="recipeIngredient"]',
-    ".ingredients li",
-    ".recipe-ingredients li",
-  ];
-
+  let title = "Untitled Recipe";
   let ingredients: string[] = [];
 
-  for (const selector of ingredientSelectors) {
-    const found = $(selector)
-      .map((_, el) => $(el).text().trim())
-      .get()
-      .filter(Boolean);
+  // First, look for Schema.org structured data
+  // This is a hidden JSON block most recipe sites embed for Google
+  const scriptTags = $('script[type="application/ld+json"]');
 
-    if (found.length > 0) {
-      ingredients = found;
-      break;
+  scriptTags.each((_, el) => {
+    try {
+      const json = JSON.parse($(el).html() || "");
+
+      // Sometimes the recipe is nested inside a @graph array
+      const data = json["@graph"]
+        ? json["@graph"].find((item: any) => item["@type"] === "Recipe")
+        : json;
+
+      if (data && data["@type"] === "Recipe") {
+        if (data.name) title = data.name;
+        if (data.recipeIngredient && data.recipeIngredient.length > 0) {
+          ingredients = data.recipeIngredient;
+        }
+      }
+    } catch {
+      // If parsing fails, just move on
+    }
+  });
+
+  // If Schema.org didn't work, fall back to CSS selectors
+  if (ingredients.length === 0) {
+    title = $("title").first().text().trim() || "Untitled Recipe";
+
+    const ingredientSelectors = [
+      '[class*="ingredient"]',
+      '[itemprop="recipeIngredient"]',
+      ".ingredients li",
+      ".recipe-ingredients li",
+    ];
+
+    for (const selector of ingredientSelectors) {
+      const found = $(selector)
+        .map((_, el) => $(el).text().trim())
+        .get()
+        .filter(Boolean);
+
+      if (found.length > 0) {
+        ingredients = found;
+        break;
+      }
     }
   }
 
@@ -59,14 +86,4 @@ export async function POST(req: NextRequest) {
       { status: 422 },
     );
   }
-
-  const { data, error } = await supabase
-    .from("recipes")
-    .insert({ title, ingredients, source_url: url })
-    .select()
-    .single();
-
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
 }
