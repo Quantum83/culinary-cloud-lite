@@ -6,6 +6,8 @@ type Recipe = {
   id: string;
   title: string;
   ingredients: string[];
+  instructions: string[];
+  image_url: string | null;
   source_url: string;
   created_at: string;
 };
@@ -261,6 +263,54 @@ export default function Home() {
           border-top: 1px solid #f0e0d0;
           margin: 16px 0;
         }
+
+        .recipe-image {
+          width: 100%;
+          height: 220px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 16px;
+        }
+
+        .recipe-columns {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+
+        .instructions-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          counter-reset: steps;
+        }
+
+        .instruction-item {
+          font-size: 14px;
+          color: #6b4a5e;
+          padding-left: 28px;
+          position: relative;
+          line-height: 1.6;
+          counter-increment: steps;
+        }
+
+        .instruction-item::before {
+          content: counter(steps);
+          position: absolute;
+          left: 0;
+          top: 1px;
+          background: #5e445a;
+          color: white;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          font-size: 10px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       `}</style>
 
       <div className="page">
@@ -300,23 +350,41 @@ export default function Home() {
 
         {recipes.map((recipe) => (
           <div className="recipe-card" key={recipe.id}>
-            <a
-              className="recipe-title"
-              href={recipe.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {recipe.title}
-            </a>
+            {recipe.image_url && (
+              <img
+                src={recipe.image_url}
+                alt={recipe.title}
+                className="recipe-image"
+              />
+            )}
+            className="recipe-title" href={recipe.source_url}
+            target="_blank" rel="noopener noreferrer"
+            <a>{recipe.title}</a>
             <hr className="recipe-divider" />
-            <p className="ingredients-label">Ingredients</p>
-            <ul className="ingredients-list">
-              {recipe.ingredients.map((ingredient, i) => (
-                <li className="ingredient-item" key={i}>
-                  {ingredient}
-                </li>
-              ))}
-            </ul>
+            <div className="recipe-columns">
+              <div className="recipe-column">
+                <p className="ingredients-label">Ingredients</p>
+                <ul className="ingredients-list">
+                  {recipe.ingredients.map((ingredient, i) => (
+                    <li className="ingredient-item" key={i}>
+                      {ingredient}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {recipe.instructions && recipe.instructions.length > 0 && (
+                <div className="recipe-column">
+                  <p className="ingredients-label">Instructions</p>
+                  <ol className="instructions-list">
+                    {recipe.instructions.map((step, i) => (
+                      <li className="instruction-item" key={i}>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

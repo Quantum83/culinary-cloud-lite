@@ -40,6 +40,8 @@ export async function POST(req: NextRequest) {
 
   let title = "Untitled Recipe";
   let ingredients: string[] = [];
+  let instructions: string[] = [];
+  let imageUrl: string | null = null;
 
   const scriptTags = $('script[type="application/ld+json"]');
 
@@ -57,11 +59,26 @@ export async function POST(req: NextRequest) {
         : json;
 
       if (data && data["@type"] === "Recipe") {
-        if (data.name) title = $.text([data.name] as any);
+        if (data.name) title = $("<div>").html(data.name).text();
         if (data.recipeIngredient && data.recipeIngredient.length > 0) {
           ingredients = data.recipeIngredient.map((ing: string) =>
             $("<div>").html(ing).text(),
           );
+        }
+        if (data.recipeInstructions && data.recipeInstructions.length > 0) {
+          instructions = data.recipeInstructions.map((step: any) =>
+            $("<div>")
+              .html(typeof step === "string" ? step : step.text)
+              .text(),
+          );
+        }
+        if (data.image) {
+          imageUrl =
+            typeof data.image === "string"
+              ? data.image
+              : Array.isArray(data.image)
+                ? data.image[0]
+                : data.image.url;
         }
       }
     } catch {
@@ -102,7 +119,13 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("recipes")
-    .insert({ title, ingredients, source_url: url })
+    .insert({
+      title,
+      ingredients,
+      instructions,
+      image_url: imageUrl,
+      source_url: url,
+    })
     .select()
     .single();
 
