@@ -266,10 +266,31 @@ export default function Home() {
 
         .recipe-image {
           width: 100%;
-          height: 220px;
-          object-fit: cover;
+          height: 180px;
+          object-fit: contain;
+          background: #f5ede3;
           border-radius: 8px;
           margin-bottom: 16px;
+        }
+
+        .recipe-details {
+          margin-top: 4px;
+        }
+
+        .recipe-summary {
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: #dc7243;
+          cursor: pointer;
+          user-select: none;
+          margin-bottom: 16px;
+          list-style: none;
+        }
+
+        .recipe-summary:hover {
+          color: #c45e30;
         }
 
         .recipe-columns {
@@ -357,34 +378,42 @@ export default function Home() {
                 className="recipe-image"
               />
             )}
-            className="recipe-title" href={recipe.source_url}
-            target="_blank" rel="noopener noreferrer"
-            <a>{recipe.title}</a>
+            <a
+              className="recipe-title"
+              href={recipe.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {recipe.title}
+            </a>
             <hr className="recipe-divider" />
-            <div className="recipe-columns">
-              <div className="recipe-column">
-                <p className="ingredients-label">Ingredients</p>
-                <ul className="ingredients-list">
-                  {recipe.ingredients.map((ingredient, i) => (
-                    <li className="ingredient-item" key={i}>
-                      {ingredient}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {recipe.instructions && recipe.instructions.length > 0 && (
+            <details className="recipe-details">
+              <summary className="recipe-summary">Show details</summary>
+              <div className="recipe-columns">
                 <div className="recipe-column">
-                  <p className="ingredients-label">Instructions</p>
-                  <ol className="instructions-list">
-                    {recipe.instructions.map((step, i) => (
-                      <li className="instruction-item" key={i}>
-                        {step}
+                  <p className="ingredients-label">Ingredients</p>
+                  <ul className="ingredients-list">
+                    {recipe.ingredients.map((ingredient, i) => (
+                      <li className="ingredient-item" key={i}>
+                        {ingredient}
                       </li>
                     ))}
-                  </ol>
+                  </ul>
                 </div>
-              )}
-            </div>
+                {recipe.instructions && recipe.instructions.length > 0 && (
+                  <div className="recipe-column">
+                    <p className="ingredients-label">Instructions</p>
+                    <ol className="instructions-list">
+                      {recipe.instructions.map((step, i) => (
+                        <li className="instruction-item" key={i}>
+                          {step}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+            </details>
           </div>
         ))}
       </div>
