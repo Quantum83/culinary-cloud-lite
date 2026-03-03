@@ -86,7 +86,6 @@ export async function POST(req: NextRequest) {
     }
   });
 
-  // If Schema.org didn't work, fall back to CSS selectors
   if (ingredients.length === 0) {
     title = $("title").first().text().trim() || "Untitled Recipe";
 
