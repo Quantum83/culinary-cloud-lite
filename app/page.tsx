@@ -17,6 +17,8 @@ export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
 
   useEffect(() => {
     fetchRecipes();
@@ -50,6 +52,24 @@ export default function Home() {
 
     setLoading(false);
   }
+
+  const filteredRecipes = recipes
+    .filter((recipe) =>
+      recipe.title.toLowerCase().includes(search.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sort === "newest")
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      if (sort === "oldest")
+        return (
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      if (sort === "az") return a.title.localeCompare(b.title);
+      if (sort === "za") return b.title.localeCompare(a.title);
+      return 0;
+    });
 
   return (
     <>
@@ -332,15 +352,58 @@ export default function Home() {
           align-items: center;
           justify-content: center;
         }
+
+        .search-row {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+
+        .search-input {
+          flex: 1;
+          border: 1.5px solid #e0cfc0;
+          border-radius: 8px;
+          padding: 10px 16px;
+          font-size: 14px;
+          font-family: 'Lato', sans-serif;
+          color: #3a2a38;
+          background: #fff;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+          border-color: #dc7243;
+        }
+
+        .search-input::placeholder {
+          color: #c4a898;
+        }
+
+        .sort-select {
+          border: 1.5px solid #e0cfc0;
+          border-radius: 8px;
+          padding: 10px 40px 10px 16px;
+          font-size: 14px;
+          font-family: 'Lato', sans-serif;
+          color: #3a2a38;
+          background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235e445a' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 14px center;
+          appearance: none;
+          outline: none;
+          cursor: pointer;
+          transition: border-color 0.2s;
+        }
+
+        .sort-select:focus {
+          border-color: #dc7243;
+        }
       `}</style>
 
       <div className="page">
         <header className="header">
           <p className="header-eyebrow">Your Recipe Collection</p>
           <h1 className="header-title">Culinary Cloud</h1>
-          <p className="header-subtitle">
-            Paste a recipe URL to save its ingredients.
-          </p>
+          <p className="header-subtitle">Paste a recipe URL to save it.</p>
         </header>
 
         <div className="form-section">
@@ -364,12 +427,35 @@ export default function Home() {
         </div>
 
         <h2 className="recipes-header">Saved Recipes</h2>
+        <div className="search-row">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Search recipes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="sort-select"
+            aria-label="Sort recipes"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+          </select>
+        </div>
 
-        {recipes.length === 0 && (
+        {filteredRecipes.length === 0 && recipes.length === 0 && (
           <p className="empty-msg">No recipes saved yet. Add one above.</p>
         )}
+        {filteredRecipes.length === 0 && recipes.length > 0 && (
+          <p className="empty-msg">No recipes match your search.</p>
+        )}
 
-        {recipes.map((recipe) => (
+        {filteredRecipes.map((recipe) => (
           <div className="recipe-card" key={recipe.id}>
             {recipe.image_url && (
               <img
