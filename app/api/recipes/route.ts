@@ -43,12 +43,34 @@ export async function POST(req: NextRequest) {
   let instructions: string[] = [];
   let imageUrl: string | null = null;
 
+  // Extract source domain for auto-tagging
+  let sourceDomain = "";
+  try {
+    const hostname = new URL(url).hostname.replace("www.", "");
+    const domainMap: Record<string, string> = {
+      "sallysbakingaddiction.com": "Sally's Baking Addiction",
+      "preppykitchen.com": "Preppy Kitchen",
+      "bbcgoodfood.com": "BBC Good Food",
+      "simplyrecipes.com": "Simply Recipes",
+      "foodnetwork.com": "Food Network",
+      "allrecipes.com": "All Recipes",
+      "tasty.co": "Tasty",
+      "bonappetit.com": "Bon Appétit",
+      "seriouseats.com": "Serious Eats",
+      "smittenkitchen.com": "Smitten Kitchen",
+      "halfbakedharvest.com": "Half Baked Harvest",
+      "minimalistbaker.com": "Minimalist Baker",
+    };
+    sourceDomain = domainMap[hostname] || hostname;
+  } catch {
+    sourceDomain = "";
+  }
+
   const scriptTags = $('script[type="application/ld+json"]');
 
   scriptTags.each((_, el) => {
     try {
       const json = JSON.parse($(el).html() || "");
-
       const data = json["@graph"]
         ? json["@graph"].find((item: any) => {
             const type = item["@type"];
@@ -88,20 +110,17 @@ export async function POST(req: NextRequest) {
 
   if (ingredients.length === 0) {
     title = $("title").first().text().trim() || "Untitled Recipe";
-
     const ingredientSelectors = [
       '[class*="ingredient"]',
       '[itemprop="recipeIngredient"]',
       ".ingredients li",
       ".recipe-ingredients li",
     ];
-
     for (const selector of ingredientSelectors) {
       const found = $(selector)
         .map((_, el) => $(el).text().trim())
         .get()
         .filter(Boolean);
-
       if (found.length > 0) {
         ingredients = found;
         break;
@@ -124,6 +143,7 @@ export async function POST(req: NextRequest) {
       instructions,
       image_url: imageUrl,
       source_url: url,
+      source_domain: sourceDomain,
     })
     .select()
     .single();
@@ -134,18 +154,20 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const { id, notes } = await req.json();
-
-  if (!id) {
+  const { id, notes, tags } = await req.json();
+  if (!id)
     return NextResponse.json(
       { error: "Recipe ID is required" },
       { status: 400 },
     );
-  }
+
+  const updates: any = {};
+  if (notes !== undefined) updates.notes = notes;
+  if (tags !== undefined) updates.tags = tags;
 
   const { data, error } = await supabase
     .from("recipes")
-    .update({ notes })
+    .update(updates)
     .eq("id", id)
     .select()
     .single();
@@ -153,4 +175,18 @@ export async function PATCH(req: NextRequest) {
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
+}
+
+export async function DELETE(req: NextRequest) {
+  const { id } = await req.json();
+  if (!id)
+    return NextResponse.json(
+      { error: "Recipe ID is required" },
+      { status: 400 },
+    );
+
+  const { error } = await supabase.from("recipes").delete().eq("id", id);
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
 }
