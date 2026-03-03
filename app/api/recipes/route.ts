@@ -132,3 +132,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data, { status: 201 });
 }
+
+export async function PATCH(req: NextRequest) {
+  const { id, notes } = await req.json();
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Recipe ID is required" },
+      { status: 400 },
+    );
+  }
+
+  const { data, error } = await supabase
+    .from("recipes")
+    .update({ notes })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}

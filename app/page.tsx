@@ -9,11 +9,35 @@ type Recipe = {
   instructions: string[];
   image_url: string | null;
   source_url: string;
+  notes: string | null;
   created_at: string;
 };
 
-function IngredientPreview({ recipe }: { recipe: Recipe }) {
+function IngredientPreview({
+  recipe,
+  onNotesSaved,
+}: {
+  recipe: Recipe;
+  onNotesSaved: (id: string, notes: string) => void;
+}) {
   const [open, setOpen] = useState(false);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesText, setNotesText] = useState(recipe.notes || "");
+  const [saving, setSaving] = useState(false);
+
+  async function saveNotes() {
+    setSaving(true);
+    const res = await fetch("/api/recipes", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: recipe.id, notes: notesText }),
+    });
+    if (res.ok) {
+      onNotesSaved(recipe.id, notesText);
+      setEditingNotes(false);
+    }
+    setSaving(false);
+  }
 
   return (
     <div className="recipe-details">
@@ -61,6 +85,47 @@ function IngredientPreview({ recipe }: { recipe: Recipe }) {
           )}
         </div>
       )}
+
+      <div className="notes-section">
+        <p className="ingredients-label">My Notes</p>
+        {editingNotes ? (
+          <>
+            <textarea
+              className="notes-textarea"
+              value={notesText}
+              onChange={(e) => setNotesText(e.target.value)}
+              placeholder="How did it turn out? Any tweaks you made?"
+              rows={3}
+            />
+            <div className="notes-actions">
+              <button
+                className="notes-save-btn"
+                onClick={saveNotes}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save note"}
+              </button>
+              <button
+                className="notes-cancel-btn"
+                onClick={() => {
+                  setEditingNotes(false);
+                  setNotesText(recipe.notes || "");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="notes-display" onClick={() => setEditingNotes(true)}>
+            {notesText ? (
+              <p className="notes-text">{notesText}</p>
+            ) : (
+              <p className="notes-placeholder">Click to add a note...</p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -152,6 +217,10 @@ export default function Home() {
       if (sort === "za") return b.title.localeCompare(a.title);
       return 0;
     });
+
+  function handleNotesSaved(id: string, notes: string) {
+    setRecipes((prev) => prev.map((r) => (r.id === id ? { ...r, notes } : r)));
+  }
 
   return (
     <>
@@ -691,6 +760,109 @@ export default function Home() {
           text-decoration: line-through;
           color: #b0a0a8;
         }
+
+        .notes-section {
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px solid #f0e0d0;
+        }
+
+        .notes-display {
+          cursor: pointer;
+          padding: 10px 14px;
+          border-radius: 8px;
+          border: 1.5px dashed #e0cfc0;
+          transition: border-color 0.2s, background 0.2s;
+          min-height: 42px;
+        }
+
+        .notes-display:hover {
+          border-color: #dc7243;
+          background: #fdf6ee;
+        }
+
+        .notes-text {
+          font-size: 14px;
+          color: #6b4a5e;
+          line-height: 1.6;
+        }
+
+        .notes-placeholder {
+          font-size: 14px;
+          color: #c4a898;
+          font-style: italic;
+        }
+
+        .notes-textarea {
+          width: 100%;
+          border: 1.5px solid #e0cfc0;
+          border-radius: 8px;
+          padding: 10px 14px;
+          font-size: 14px;
+          font-family: 'Lato', sans-serif;
+          color: #3a2a38;
+          background: #fdf6ee;
+          outline: none;
+          resize: vertical;
+          transition: border-color 0.2s;
+          line-height: 1.6;
+        }
+
+        .notes-textarea:focus {
+          border-color: #dc7243;
+        }
+
+        .notes-actions {
+          display: flex;
+          gap: 8px;
+          margin-top: 8px;
+        }
+
+        .notes-save-btn {
+          background: #dc7243;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: 'Lato', sans-serif;
+          transition: background 0.2s, transform 0.2s;
+        }
+
+        .notes-save-btn:hover {
+          background: #c45e30;
+          transform: scale(1.03) rotate(-0.5deg);
+        }
+
+        .notes-save-btn:disabled {
+          background: #e0b89e;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .notes-cancel-btn {
+          background: none;
+          color: #a65a6e;
+          border: 1.5px solid #e0cfc0;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: 'Lato', sans-serif;
+          transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .notes-cancel-btn:hover {
+          border-color: #a65a6e;
+          transform: scale(1.03) rotate(0.5deg);
+        }
       `}</style>
 
       <div className="page">
@@ -801,7 +973,10 @@ export default function Home() {
               </a>
             </div>
             <hr className="recipe-divider" />
-            <IngredientPreview recipe={recipe} />
+            <IngredientPreview
+              recipe={recipe}
+              onNotesSaved={handleNotesSaved}
+            />
           </div>
         ))}
       </div>
