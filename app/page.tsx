@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "@/lib/supabase";
 
 type Recipe = {
   id: string;
@@ -79,7 +80,10 @@ function TagInput({
     onTagsUpdated(recipe.id, newTags);
     await fetch("/api/recipes", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}`,
+      },
       body: JSON.stringify({ id: recipe.id, tags: newTags }),
     });
     setInput("");
@@ -91,7 +95,10 @@ function TagInput({
     onTagsUpdated(recipe.id, newTags);
     await fetch("/api/recipes", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}`,
+      },
       body: JSON.stringify({ id: recipe.id, tags: newTags }),
     });
   }
@@ -240,7 +247,10 @@ function IngredientPreview({
     setSaving(true);
     const res = await fetch("/api/recipes", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}`,
+      },
       body: JSON.stringify({ id: recipe.id, notes: notesText }),
     });
     if (res.ok) {
@@ -357,11 +367,31 @@ export default function Home() {
   const [groceryLoading, setGroceryLoading] = useState(false);
 
   useEffect(() => {
-    fetchRecipes();
+    initSession();
   }, []);
 
+  async function getAuthHeaders() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session?.access_token ?? ""}`,
+    };
+  }
+  async function initSession() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      await supabase.auth.signInAnonymously();
+    }
+    fetchRecipes();
+  }
+
   async function fetchRecipes() {
-    const res = await fetch("/api/recipes");
+    const headers = await getAuthHeaders();
+    const res = await fetch("/api/recipes", { headers });
     const data = await res.json();
     setRecipes(data);
   }
@@ -370,9 +400,10 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    const headers = await getAuthHeaders();
     const res = await fetch("/api/recipes", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ url }),
     });
     const data = await res.json();
@@ -386,9 +417,10 @@ export default function Home() {
   }
 
   async function handleDelete(id: string) {
+    const headers = await getAuthHeaders();
     const res = await fetch("/api/recipes", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ id }),
     });
     if (res.ok) {
@@ -415,9 +447,10 @@ export default function Home() {
     setGroceryLoading(true);
 
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch("/api/recipes", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ ingredients: rawIngredients }),
       });
       const data = await res.json();

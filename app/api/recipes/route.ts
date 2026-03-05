@@ -1,6 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+function getSupabaseForUser(req: NextRequest) {
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.replace("Bearer ", "");
+
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      },
+    },
+  );
+}
+
+async function getUserId(req: NextRequest): Promise<string | null> {
+  const supabase = getSupabaseForUser(req);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
 
 async function callClaude(
   prompt: string,
@@ -25,7 +50,9 @@ async function callClaude(
   return data.content[0].text.trim();
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const supabase = getSupabaseForUser(req);
+
   const { data, error } = await supabase
     .from("recipes")
     .select("*")
@@ -37,6 +64,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseForUser(req);
   const { url } = await req.json();
 
   if (!url) {
@@ -66,7 +94,6 @@ export async function POST(req: NextRequest) {
   let instructions: string[] = [];
   let imageUrl: string | null = null;
 
-  // Extract source domain for auto-tagging
   let sourceDomain = "";
   try {
     const hostname = new URL(url).hostname.replace("www.", "");
@@ -158,7 +185,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Auto-tag using Claude
   let tags: string[] = [];
   try {
     const tagText = await callClaude(
@@ -175,6 +201,8 @@ Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italia
     tags = [];
   }
 
+  const userId = await getUserId(req);
+
   const { data, error } = await supabase
     .from("recipes")
     .insert({
@@ -185,6 +213,7 @@ Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italia
       source_url: url,
       source_domain: sourceDomain,
       tags,
+      user_id: userId,
     })
     .select()
     .single();
@@ -195,6 +224,7 @@ Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italia
 }
 
 export async function PATCH(req: NextRequest) {
+  const supabase = getSupabaseForUser(req);
   const { id, notes, tags } = await req.json();
   if (!id)
     return NextResponse.json(
@@ -219,6 +249,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const supabase = getSupabaseForUser(req);
   const { id } = await req.json();
   if (!id)
     return NextResponse.json(
@@ -232,7 +263,6 @@ export async function DELETE(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-// New route for combining grocery ingredients
 export async function PUT(req: NextRequest) {
   const { ingredients } = await req.json();
 
@@ -275,7 +305,6 @@ ${ingredients.join("\n")}`,
     const result = JSON.parse(combined.replace(/```json|```/g, "").trim());
     return NextResponse.json({ ingredients: result });
   } catch {
-    // If Claude fails, just return the original list
     return NextResponse.json({ ingredients });
   }
 }
