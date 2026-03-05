@@ -2,6 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { supabase } from "@/lib/supabase";
 
+async function callClaude(
+  prompt: string,
+  maxTokens: number = 200,
+): Promise<string> {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.ANTHROPIC_API_KEY!,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: maxTokens,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+  const data = await response.json();
+  if (!data.content || !data.content[0])
+    throw new Error("No response from Claude");
+  return data.content[0].text.trim();
+}
+
 export async function GET() {
   const { data, error } = await supabase
     .from("recipes")
@@ -135,6 +158,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Auto-tag using Claude
+  let tags: string[] = [];
+  try {
+    const tagText = await callClaude(
+      `Given this recipe title and ingredients, assign 2-4 short tags from these categories ONLY:
+breakfast, lunch, dinner, dessert, snack, vegetarian, vegan, quick, baking, healthy, comfort food, italian, mexican, asian, american, chocolate, cookies, cake, soup, salad, pasta
+
+Title: ${title}
+Ingredients: ${ingredients.slice(0, 10).join(", ")}
+
+Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italian", "quick"]`,
+    );
+    tags = JSON.parse(tagText.replace(/```json|```/g, "").trim());
+  } catch {
+    tags = [];
+  }
+
   const { data, error } = await supabase
     .from("recipes")
     .insert({
@@ -144,6 +184,7 @@ export async function POST(req: NextRequest) {
       image_url: imageUrl,
       source_url: url,
       source_domain: sourceDomain,
+      tags,
     })
     .select()
     .single();
@@ -189,4 +230,52 @@ export async function DELETE(req: NextRequest) {
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
+}
+
+// New route for combining grocery ingredients
+export async function PUT(req: NextRequest) {
+  const { ingredients } = await req.json();
+
+  if (!ingredients || ingredients.length === 0) {
+    return NextResponse.json(
+      { error: "No ingredients provided" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const combined = await callClaude(
+      `You are a precise cooking assistant. I have ingredients from multiple recipes that need to be combined into a smart grocery list.
+
+For each unique ingredient:
+1. Add up all quantities mathematically into a single total (convert to consistent units first)
+2. Show the total clearly
+3. Show a breakdown of which recipe needs what amount
+
+Return a JSON array where each item is a string formatted exactly like this:
+"TOTAL_AMOUNT INGREDIENT_NAME | breakdown: AMOUNT (RECIPE_HINT), AMOUNT (RECIPE_HINT)"
+
+Example output:
+["3 cups all-purpose flour | breakdown: 2 cups (chocolate cake), 1 cup (cookie dough)",
+ "4 large eggs | breakdown: 2 eggs (chocolate cake), 2 eggs (brioche)",
+ "1 tsp vanilla extract | breakdown: 1 tsp (cookie dough)"]
+
+Rules:
+- Convert everything to the same unit before adding (e.g. convert all butter to grams)
+- For the total, use the most practical unit (grams for butter, cups for flour etc.)
+- If quantities truly cannot be combined, still group them under one item
+- The recipe hint should be 2-3 words max describing the ingredient's context
+- Remove exact duplicates
+- Reply with ONLY the JSON array, no other text
+
+Ingredients to combine:
+${ingredients.join("\n")}`,
+      2000,
+    );
+    const result = JSON.parse(combined.replace(/```json|```/g, "").trim());
+    return NextResponse.json({ ingredients: result });
+  } catch {
+    // If Claude fails, just return the original list
+    return NextResponse.json({ ingredients });
+  }
 }

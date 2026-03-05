@@ -354,6 +354,7 @@ export default function Home() {
   const [checkedIngredients, setCheckedIngredients] = useState<string[]>([]);
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [activeSources, setActiveSources] = useState<string[]>([]);
+  const [groceryLoading, setGroceryLoading] = useState(false);
 
   useEffect(() => {
     fetchRecipes();
@@ -402,14 +403,30 @@ export default function Home() {
     );
   }
 
-  function generateGroceryList() {
-    const ingredients = recipes
+  async function generateGroceryList() {
+    const rawIngredients = recipes
       .filter((r) => selectedRecipes.includes(r.id))
       .flatMap((r) => r.ingredients);
-    setGroceryIngredients(ingredients);
+
+    setGroceryIngredients([]);
     setCheckedIngredients([]);
     setGroceryOpen(true);
     setGroceryMinimized(false);
+    setGroceryLoading(true);
+
+    try {
+      const res = await fetch("/api/recipes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ingredients: rawIngredients }),
+      });
+      const data = await res.json();
+      if (data.ingredients) setGroceryIngredients(data.ingredients);
+    } catch {
+      setGroceryIngredients(rawIngredients);
+    }
+
+    setGroceryLoading(false);
   }
 
   function toggleIngredient(ingredient: string) {
@@ -766,6 +783,30 @@ export default function Home() {
         .grocery-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #3a2a38; line-height: 1.4; }
         .grocery-item input[type="checkbox"] { margin-top: 2px; accent-color: #dc7243; flex-shrink: 0; }
         .grocery-checked { text-decoration: line-through; color: #b0a0a8; }
+
+        .grocery-breakdown {
+          list-style: none;
+          margin-top: 4px;
+          padding-left: 4px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .grocery-breakdown-item {
+          font-size: 11px;
+          color: #a65a6e;
+          padding-left: 10px;
+          position: relative;
+          line-height: 1.4;
+        }
+
+        .grocery-breakdown-item::before {
+          content: '·';
+          position: absolute;
+          left: 0;
+          color: #dd9d5b;
+        }
       `}</style>
 
       <div className="page">
@@ -1020,8 +1061,10 @@ export default function Home() {
             onClick={() => setGroceryMinimized((prev) => !prev)}
           >
             <span>
-              🛒 Grocery List (
-              {groceryIngredients.length - checkedIngredients.length} remaining)
+              🛒{" "}
+              {groceryLoading
+                ? "Combining ingredients..."
+                : `Grocery List (${groceryIngredients.length - checkedIngredients.length} remaining)`}
             </span>
             <button className="grocery-minimize-btn">
               {groceryMinimized ? "▲" : "▼"}
@@ -1030,25 +1073,43 @@ export default function Home() {
           {!groceryMinimized && (
             <div className="grocery-panel-body">
               <ul className="grocery-list">
-                {groceryIngredients.map((ingredient, i) => (
-                  <li key={i} className="grocery-item">
-                    <input
-                      type="checkbox"
-                      aria-label={`Have ${ingredient}`}
-                      checked={checkedIngredients.includes(ingredient)}
-                      onChange={() => toggleIngredient(ingredient)}
-                    />
-                    <span
-                      className={
-                        checkedIngredients.includes(ingredient)
-                          ? "grocery-checked"
-                          : ""
-                      }
-                    >
-                      {ingredient}
-                    </span>
-                  </li>
-                ))}
+                {groceryIngredients.map((ingredient, i) => {
+                  const [main, breakdownPart] =
+                    ingredient.split(" | breakdown: ");
+                  const breakdown = breakdownPart
+                    ? breakdownPart.split(", ")
+                    : [];
+                  return (
+                    <li key={i} className="grocery-item">
+                      <input
+                        type="checkbox"
+                        aria-label={`Have ${main}`}
+                        checked={checkedIngredients.includes(ingredient)}
+                        onChange={() => toggleIngredient(ingredient)}
+                      />
+                      <div>
+                        <span
+                          className={
+                            checkedIngredients.includes(ingredient)
+                              ? "grocery-checked"
+                              : ""
+                          }
+                        >
+                          {main}
+                        </span>
+                        {breakdown.length > 0 && (
+                          <ul className="grocery-breakdown">
+                            {breakdown.map((item, j) => (
+                              <li key={j} className="grocery-breakdown-item">
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
