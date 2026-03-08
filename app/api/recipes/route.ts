@@ -3,19 +3,11 @@ import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabaseForUser(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  const token = authHeader?.replace("Bearer ", "");
-
+  const token = req.headers.get("authorization")?.replace("Bearer ", "");
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      global: {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      },
-    },
+    { global: { headers: { Authorization: token ? `Bearer ${token}` : "" } } },
   );
 }
 
@@ -27,11 +19,8 @@ async function getUserId(req: NextRequest): Promise<string | null> {
   return user?.id ?? null;
 }
 
-async function callClaude(
-  prompt: string,
-  maxTokens: number = 200,
-): Promise<string> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+async function callClaude(prompt: string, maxTokens = 200): Promise<string> {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,20 +33,17 @@ async function callClaude(
       messages: [{ role: "user", content: prompt }],
     }),
   });
-  const data = await response.json();
-  if (!data.content || !data.content[0])
-    throw new Error("No response from Claude");
+  const data = await res.json();
+  if (!data.content?.[0]) throw new Error("No response from Claude");
   return data.content[0].text.trim();
 }
 
 export async function GET(req: NextRequest) {
   const supabase = getSupabaseForUser(req);
-
   const { data, error } = await supabase
     .from("recipes")
     .select("*")
     .order("created_at", { ascending: false });
-
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
@@ -66,10 +52,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const supabase = getSupabaseForUser(req);
   const { url } = await req.json();
-
-  if (!url) {
+  if (!url)
     return NextResponse.json({ error: "URL is required" }, { status: 400 });
-  }
 
   let html: string;
   try {
@@ -88,7 +72,6 @@ export async function POST(req: NextRequest) {
   }
 
   const $ = cheerio.load(html);
-
   let title = "Untitled Recipe";
   let ingredients: string[] = [];
   let instructions: string[] = [];
@@ -116,9 +99,7 @@ export async function POST(req: NextRequest) {
     sourceDomain = "";
   }
 
-  const scriptTags = $('script[type="application/ld+json"]');
-
-  scriptTags.each((_, el) => {
+  $('script[type="application/ld+json"]').each((_, el) => {
     try {
       const json = JSON.parse($(el).html() || "");
       const data = json["@graph"]
@@ -129,15 +110,14 @@ export async function POST(req: NextRequest) {
               : type === "Recipe";
           })
         : json;
-
-      if (data && data["@type"] === "Recipe") {
+      if (data?.["@type"] === "Recipe") {
         if (data.name) title = $("<div>").html(data.name).text();
-        if (data.recipeIngredient && data.recipeIngredient.length > 0) {
+        if (data.recipeIngredient?.length) {
           ingredients = data.recipeIngredient.map((ing: string) =>
             $("<div>").html(ing).text(),
           );
         }
-        if (data.recipeInstructions && data.recipeInstructions.length > 0) {
+        if (data.recipeInstructions?.length) {
           instructions = data.recipeInstructions.map((step: any) =>
             $("<div>")
               .html(typeof step === "string" ? step : step.text)
@@ -154,31 +134,29 @@ export async function POST(req: NextRequest) {
         }
       }
     } catch {
-      // If parsing fails, just move on
+      /* skip */
     }
   });
 
-  if (ingredients.length === 0) {
+  if (!ingredients.length) {
     title = $("title").first().text().trim() || "Untitled Recipe";
-    const ingredientSelectors = [
+    for (const selector of [
       '[class*="ingredient"]',
       '[itemprop="recipeIngredient"]',
       ".ingredients li",
-      ".recipe-ingredients li",
-    ];
-    for (const selector of ingredientSelectors) {
+    ]) {
       const found = $(selector)
         .map((_, el) => $(el).text().trim())
         .get()
         .filter(Boolean);
-      if (found.length > 0) {
+      if (found.length) {
         ingredients = found;
         break;
       }
     }
   }
 
-  if (ingredients.length === 0) {
+  if (!ingredients.length) {
     return NextResponse.json(
       { error: "Could not extract ingredients. Try a different URL." },
       { status: 422 },
@@ -202,7 +180,6 @@ Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italia
   }
 
   const userId = await getUserId(req);
-
   const { data, error } = await supabase
     .from("recipes")
     .insert({
@@ -242,7 +219,6 @@ export async function PATCH(req: NextRequest) {
     .eq("id", id)
     .select()
     .single();
-
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
@@ -265,40 +241,31 @@ export async function DELETE(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   const { ingredients } = await req.json();
-
-  if (!ingredients || ingredients.length === 0) {
+  if (!ingredients?.length)
     return NextResponse.json(
       { error: "No ingredients provided" },
       { status: 400 },
     );
-  }
 
   try {
     const combined = await callClaude(
-      `You are a precise cooking assistant. I have ingredients from multiple recipes that need to be combined into a smart grocery list.
+      `You are a precise cooking assistant. Combine these ingredients from multiple recipes into a smart grocery list.
 
 For each unique ingredient:
-1. Add up all quantities mathematically into a single total (convert to consistent units first)
-2. Show the total clearly
-3. Show a breakdown of which recipe needs what amount
+1. Add up all quantities mathematically into a single total
+2. Show a breakdown per recipe
 
-Return a JSON array where each item is a string formatted exactly like this:
+Return a JSON array where each item is formatted exactly like:
 "TOTAL_AMOUNT INGREDIENT_NAME | breakdown: AMOUNT (RECIPE_HINT), AMOUNT (RECIPE_HINT)"
 
-Example output:
-["3 cups all-purpose flour | breakdown: 2 cups (chocolate cake), 1 cup (cookie dough)",
- "4 large eggs | breakdown: 2 eggs (chocolate cake), 2 eggs (brioche)",
- "1 tsp vanilla extract | breakdown: 1 tsp (cookie dough)"]
-
 Rules:
-- Convert everything to the same unit before adding (e.g. convert all butter to grams)
-- For the total, use the most practical unit (grams for butter, cups for flour etc.)
-- If quantities truly cannot be combined, still group them under one item
-- The recipe hint should be 2-3 words max describing the ingredient's context
+- Convert to consistent units before adding
+- Use practical units in the total
+- Recipe hint should be 2-3 words max
 - Remove exact duplicates
-- Reply with ONLY the JSON array, no other text
+- Reply with ONLY the JSON array
 
-Ingredients to combine:
+Ingredients:
 ${ingredients.join("\n")}`,
       2000,
     );
