@@ -686,7 +686,7 @@ export default function Home() {
             </svg>
           </a>
           <a
-            href="https://x.com/YOUR_HANDLE"
+            href="https://x.com/BasZak25"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="X"
