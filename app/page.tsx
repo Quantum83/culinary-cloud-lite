@@ -266,7 +266,7 @@ export default function Home() {
           background: #ede3d8;
           position: sticky;
           top: 24px;
-          height: calc(100vh - 48px);
+          height: calc(100vh - 96px);
           margin: 24px 0 24px 24px;
           overflow-y: auto;
           display: flex;
@@ -331,7 +331,7 @@ export default function Home() {
         .new-collection-save { background: var(--accent); color: white; border: none; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Lato', sans-serif; }
         .new-collection-cancel { background: none; color: #a65a6e; border: 1px solid #e0cfc0; border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: 'Lato', sans-serif; }
 
-        .main-content { width: 100%; max-width: 860px; padding: 60px 32px 80px; min-width: 0; }
+        .main-content { width: 100%; max-width: 860px; padding: 60px 32px 100px; min-width: 0; }
 
         .header { margin-bottom: 24px; border-bottom: 2px solid var(--primary); padding-bottom: 24px; }
         .header-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
@@ -557,6 +557,13 @@ export default function Home() {
           .compare-cards-grid { grid-template-columns: 1fr !important; }
           .week-grid { grid-template-columns: repeat(2, 1fr); }
         }
+
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: var(--bg); border-top: 1px solid #e8d8c4; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 90; }
+        .footer-text { font-size: 13px; color: #a65a6e; }
+        .footer-text strong { color: var(--primary); }
+        .footer-links { display: flex; gap: 16px; align-items: center; }
+        .footer-icon { color: #a65a6e; transition: color 0.2s, transform 0.2s; display: flex; }
+        .footer-icon:hover { color: var(--primary); transform: scale(1.15); }
       `}</style>
 
       <div className="app-layout">
@@ -662,6 +669,54 @@ export default function Home() {
           </main>
         </div>
       </div>
+      <footer className="footer">
+        <p className="footer-text">
+          Built by <strong>BasZak</strong>
+        </p>
+        <div className="footer-links">
+          <a
+            href="https://www.linkedin.com/in/basem-zaky-450733312/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="footer-icon"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+            </svg>
+          </a>
+          <a
+            href="https://x.com/YOUR_HANDLE"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="X"
+            className="footer-icon"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+          <a
+            href="mailto:baszaksocial@gmail.com"
+            aria-label="Email"
+            className="footer-icon"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+          </a>
+        </div>
+      </footer>
 
       {showGroceryPanel && (
         <GroceryPanel
