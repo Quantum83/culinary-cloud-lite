@@ -251,9 +251,11 @@ export async function PUT(req: NextRequest) {
     const combined = await callClaude(
       `You are a precise cooking assistant. Combine these ingredients from multiple recipes into a smart grocery list.
 
+Each ingredient is prefixed with the recipe title in brackets like [Recipe Title].
+
 For each unique ingredient:
 1. Add up all quantities mathematically into a single total
-2. Show a breakdown per recipe
+2. Show a breakdown per recipe using the recipe title as the hint (2-3 words max from the title)
 
 Return a JSON array where each item is formatted exactly like:
 "TOTAL_AMOUNT INGREDIENT_NAME | breakdown: AMOUNT (RECIPE_HINT), AMOUNT (RECIPE_HINT)"
@@ -261,7 +263,7 @@ Return a JSON array where each item is formatted exactly like:
 Rules:
 - Convert to consistent units before adding
 - Use practical units in the total
-- Recipe hint should be 2-3 words max
+- Recipe hint should be 2-3 words max from the actual recipe title
 - Remove exact duplicates
 - Reply with ONLY the JSON array
 

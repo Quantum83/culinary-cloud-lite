@@ -81,7 +81,8 @@ export default function RecipeCard({
           className="recipe-image-wrapper"
           onClick={(e) => {
             if ((e.target as HTMLElement).closest(".overlay-trash-btn")) return;
-            onSelect(recipe.id);
+            if ((e.target as HTMLElement).closest(".mobile-action-btn")) return;
+            if (window.innerWidth > 640) onSelect(recipe.id);
           }}
         >
           <div
@@ -97,6 +98,8 @@ export default function RecipeCard({
           {recipe.source_domain && (
             <div className="source-badge">{recipe.source_domain}</div>
           )}
+
+          {/* Desktop overlay */}
           <div
             className={`recipe-image-overlay ${isSelected ? "overlay-checked" : ""}`}
           >
@@ -151,6 +154,67 @@ export default function RecipeCard({
               </button>
             </div>
           </div>
+
+          {/* Mobile always-visible actions */}
+          <div className="mobile-image-actions">
+            <button
+              className={`mobile-action-btn mobile-select-btn ${isSelected ? "mobile-selected" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(recipe.id);
+              }}
+              aria-label="Select recipe"
+            >
+              {isSelected ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </button>
+            <button
+              className="mobile-action-btn mobile-delete-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(recipe.id);
+              }}
+              aria-label="Delete recipe"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14H6L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4h6v2" />
+              </svg>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="no-image-actions">
@@ -159,35 +223,19 @@ export default function RecipeCard({
             onClick={() => onDelete(recipe.id)}
             aria-label="Delete recipe"
           >
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <polyline
-                points="3 6 5 6 21 6"
-                stroke="#dc7243"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <path
-                d="M19 6l-1 14H6L5 6"
-                stroke="#dc7243"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <path
-                d="M10 11v6M14 11v6"
-                stroke="#dc7243"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <path
-                d="M9 6V4h6v2"
-                stroke="#dc7243"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="#dc7243"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14H6L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4h6v2" />
             </svg>
           </button>
         </div>
@@ -225,10 +273,7 @@ export default function RecipeCard({
             </ul>
           </div>
         )}
-        <button
-          className="recipe-summary"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
+        <button className="recipe-summary" onClick={() => setIsOpen((p) => !p)}>
           {isOpen ? "Hide details" : "Show details"}
         </button>
         {isOpen && (
@@ -270,7 +315,6 @@ export default function RecipeCard({
             </div>
           </>
         )}
-
         <div className="notes-section">
           <p className="ingredients-label">My Notes</p>
           {isEditingNotes ? (
@@ -279,7 +323,7 @@ export default function RecipeCard({
                 className="notes-textarea"
                 value={notesText}
                 onChange={(e) => setNotesText(e.target.value)}
-                placeholder="How did it turn out? Any tweaks you made?"
+                placeholder="How did it turn out?"
                 rows={3}
               />
               <div className="notes-actions">

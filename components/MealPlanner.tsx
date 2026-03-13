@@ -119,11 +119,14 @@ export default function MealPlanner({
   }
 
   async function generateGroceryList() {
-    const allScheduledIngredients = Object.values(weekData)
+    const allScheduledRecipes = Object.values(weekData)
       .flat()
       .map((id) => recipeMap[id])
-      .filter(Boolean)
-      .flatMap((r) => r.ingredients);
+      .filter(Boolean);
+
+    const allScheduledIngredients = allScheduledRecipes.flatMap((r) =>
+      r.ingredients.map((ing: string) => `[${r.title}] ${ing}`),
+    );
 
     setGroceryIngredients([]);
     setCheckedIngredients([]);
@@ -163,7 +166,10 @@ export default function MealPlanner({
       <div className="planner-header">
         <div className="planner-actions">
           {hasScheduledRecipes && (
-            <button className="grocery-btn" onClick={generateGroceryList}>
+            <button
+              className="planner-grocery-btn"
+              onClick={generateGroceryList}
+            >
               🛒 Grocery List for This Week
             </button>
           )}

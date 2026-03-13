@@ -10,27 +10,25 @@ type StickyActionsProps = {
   recipes: Recipe[];
   collections: Collection[];
   isPlannerActive: boolean;
-  onGenerateGroceryList: () => void;
   onCompare: () => void;
   onAddToCollection: (collectionId: string) => void;
   onCreateAndAddCollection: (name: string) => void;
   onAddToPlanner: () => void;
+  onDeselectAll: () => void;
 };
 
 export default function StickyActions({
   selectedRecipeIds,
-  recipes,
   collections,
   isPlannerActive,
-  onGenerateGroceryList,
   onCompare,
   onAddToCollection,
   onCreateAndAddCollection,
   onAddToPlanner,
+  onDeselectAll,
 }: StickyActionsProps) {
   const [showCollectionPicker, setShowCollectionPicker] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
-
   const canCompare =
     selectedRecipeIds.length >= 2 && selectedRecipeIds.length <= 4;
 
@@ -38,11 +36,6 @@ export default function StickyActions({
 
   return (
     <div className="sticky-actions">
-      {!isPlannerActive && (
-        <button className="grocery-btn" onClick={onGenerateGroceryList}>
-          🛒 Grocery List ({selectedRecipeIds.length})
-        </button>
-      )}
       {canCompare && !isPlannerActive && (
         <button className="compare-btn" onClick={onCompare}>
           ⚖️ Compare ({selectedRecipeIds.length})
@@ -95,6 +88,9 @@ export default function StickyActions({
       )}
       <button className="add-planner-btn" onClick={onAddToPlanner}>
         📅 Add to Planner ({selectedRecipeIds.length})
+      </button>
+      <button className="deselect-btn" onClick={onDeselectAll}>
+        ✕ Clear
       </button>
     </div>
   );
