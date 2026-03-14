@@ -4,17 +4,19 @@ import { useState, useEffect } from "react";
 import { getAuthHeaders } from "@/lib/supabase";
 
 type GroceryPanelProps = {
-  selectedRecipeIds: string[];
-  recipes: any[];
+  ingredientSource: string[];
   onClose: () => void;
+  shouldRegenerate: number;
+  isHidden: boolean;
 };
 
 const CACHE_KEY = "groceryListCache";
 
 export default function GroceryPanel({
-  selectedRecipeIds,
-  recipes,
+  ingredientSource,
   onClose,
+  shouldRegenerate,
+  isHidden,
 }: GroceryPanelProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -25,58 +27,45 @@ export default function GroceryPanel({
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
-        const { ingredients: cachedIngredients, recipeIds } =
-          JSON.parse(cached);
-        const sameSelection =
-          selectedRecipeIds.length === recipeIds.length &&
-          selectedRecipeIds.every((id: string) => recipeIds.includes(id));
-        if (sameSelection && cachedIngredients.length > 0) {
+        const { ingredients: cachedIngredients } = JSON.parse(cached);
+        if (cachedIngredients?.length > 0) {
           setIngredients(cachedIngredients);
           return;
         }
       }
     } catch {}
-    if (selectedRecipeIds.length > 0) generateList();
+    // only auto-generate if no cache at all and we have ingredients
+    if (ingredientSource.length > 0) generateList();
   }, []);
 
-  async function generateList() {
-    const selectedRecipes = recipes.filter((r) =>
-      selectedRecipeIds.includes(r.id),
-    );
-    const rawIngredients = selectedRecipes.flatMap((r) =>
-      r.ingredients.map((ing: string) => `[${r.title}] ${ing}`),
-    );
+  useEffect(() => {
+    if (shouldRegenerate > 0) generateList();
+  }, [shouldRegenerate]);
 
+  async function generateList() {
     setIngredients([]);
     setCheckedIngredients([]);
     setIsLoading(true);
-
     try {
       const headers = await getAuthHeaders();
       const res = await fetch("/api/recipes", {
         method: "PUT",
         headers,
-        body: JSON.stringify({ ingredients: rawIngredients }),
+        body: JSON.stringify({ ingredients: ingredientSource }),
       });
       const data = await res.json();
       if (data.ingredients) {
         setIngredients(data.ingredients);
         localStorage.setItem(
           CACHE_KEY,
-          JSON.stringify({
-            ingredients: data.ingredients,
-            recipeIds: selectedRecipeIds,
-          }),
+          JSON.stringify({ ingredients: data.ingredients }),
         );
       }
     } catch {
-      setIngredients(rawIngredients);
+      setIngredients(ingredientSource);
       localStorage.setItem(
         CACHE_KEY,
-        JSON.stringify({
-          ingredients: rawIngredients,
-          recipeIds: selectedRecipeIds,
-        }),
+        JSON.stringify({ ingredients: ingredientSource }),
       );
     }
     setIsLoading(false);
@@ -93,7 +82,9 @@ export default function GroceryPanel({
   const remaining = ingredients.length - checkedIngredients.length;
 
   return (
-    <div className={`grocery-panel ${isMinimized ? "grocery-minimized" : ""}`}>
+    <div
+      className={`grocery-panel ${isMinimized ? "grocery-minimized" : ""} ${isHidden ? "grocery-panel-hidden" : ""}`}
+    >
       <div className="grocery-panel-header">
         <span
           onClick={() => setIsMinimized((p) => !p)}
@@ -116,15 +107,6 @@ export default function GroceryPanel({
       </div>
       {!isMinimized && (
         <div className="grocery-panel-body">
-          {ingredients.length > 0 && (
-            <button
-              className="grocery-regenerate-btn"
-              onClick={generateList}
-              disabled={isLoading}
-            >
-              ↺ Regenerate
-            </button>
-          )}
           <ul className="grocery-list">
             {ingredients.map((ingredient, i) => {
               const [main, breakdownPart] = ingredient.split(" | breakdown: ");

@@ -14,11 +14,16 @@ type CollectionsSidebarProps = {
   activeCollectionId: string | null;
   isPlannerActive: boolean;
   isGroceryOpen: boolean;
+  isDark: boolean;
+  grocerySource: "selected" | "planner";
   onSelect: (id: string | null) => void;
   onPlannerSelect: () => void;
-  onGroceryOpen: () => void;
+  onGroceryToggle: () => void;
+  onGroceryRegenerate: () => void;
+  onGrocerySourceChange: (source: "selected" | "planner") => void;
   onCollectionsUpdated: (collections: Collection[]) => void;
   onSettingsOpen: () => void;
+  onDarkToggle: () => void;
 };
 
 export default function CollectionsSidebar({
@@ -26,15 +31,21 @@ export default function CollectionsSidebar({
   activeCollectionId,
   isPlannerActive,
   isGroceryOpen,
+  isDark,
+  grocerySource,
   onSelect,
   onPlannerSelect,
-  onGroceryOpen,
+  onGroceryToggle,
+  onGroceryRegenerate,
+  onGrocerySourceChange,
   onCollectionsUpdated,
   onSettingsOpen,
+  onDarkToggle,
 }: CollectionsSidebarProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isSourceOpen, setIsSourceOpen] = useState(false);
 
   async function createCollection() {
     if (!newName.trim()) return;
@@ -66,6 +77,7 @@ export default function CollectionsSidebar({
   return (
     <aside className="collections-sidebar">
       <p className="sidebar-label">Collections</p>
+
       <ul className="collections-list">
         <li
           className={`collection-item ${!isPlannerActive && activeCollectionId === null ? "active" : ""}`}
@@ -117,21 +129,6 @@ export default function CollectionsSidebar({
             )}
           </li>
         ))}
-        <li role="separator" className="sidebar-divider" />
-        <li
-          className={`collection-item ${isPlannerActive ? "active" : ""}`}
-          onClick={onPlannerSelect}
-        >
-          <span className="collection-icon">📅</span>
-          <span className="collection-name">Meal Planner</span>
-        </li>
-        <li
-          className={`collection-item ${isGroceryOpen ? "active" : ""}`}
-          onClick={onGroceryOpen}
-        >
-          <span className="collection-icon">🛒</span>
-          <span className="collection-name">Grocery List</span>
-        </li>
       </ul>
 
       {isCreating ? (
@@ -175,26 +172,147 @@ export default function CollectionsSidebar({
 
       <div className="sidebar-spacer" />
 
-      <button
-        className="settings-gear-btn"
-        onClick={onSettingsOpen}
-        aria-label="Theme settings"
+      <li
+        className={`collection-item ${isPlannerActive ? "active" : ""}`}
+        onClick={onPlannerSelect}
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <span className="collection-icon">📅</span>
+        <span className="collection-name">Meal Planner</span>
+      </li>
+
+      <div className="grocery-sidebar-widget">
+        <div className="grocery-sidebar-row">
+          <button
+            className={`grocery-sidebar-main ${isGroceryOpen ? "active" : ""}`}
+            onClick={onGroceryToggle}
+          >
+            <span className="collection-icon">🛒</span>
+            <span className="grocery-sidebar-label">Grocery List</span>
+          </button>
+          <button
+            className="grocery-sidebar-regen"
+            onClick={onGroceryRegenerate}
+            aria-label="Regenerate grocery list"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M23 4v6h-6" />
+              <path d="M1 20v-6h6" />
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+          </button>
+        </div>
+        <div
+          className={`grocery-source-dropdown ${isSourceOpen ? "open" : ""}`}
         >
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-        <span className="settings-gear-label">Theme</span>
-      </button>
+          <p className="grocery-source-label">Generate from:</p>
+          <button
+            className={`grocery-source-option ${grocerySource === "selected" ? "selected" : ""}`}
+            onClick={() => {
+              onGrocerySourceChange("selected");
+              setIsSourceOpen(false);
+            }}
+          >
+            Selected Recipes
+          </button>
+          <button
+            className={`grocery-source-option ${grocerySource === "planner" ? "selected" : ""}`}
+            onClick={() => {
+              onGrocerySourceChange("planner");
+              setIsSourceOpen(false);
+            }}
+          >
+            Meal Planner
+          </button>
+        </div>
+        <button
+          className={`grocery-source-chevron ${isSourceOpen ? "open" : ""}`}
+          onClick={() => setIsSourceOpen((p) => !p)}
+          aria-label="Select grocery source"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="12"
+            height="12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="sidebar-bottom-row">
+        <button
+          className="settings-gear-btn"
+          onClick={onSettingsOpen}
+          aria-label="Settings"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          <span className="settings-gear-label">Settings</span>
+        </button>
+        <button
+          className="dark-toggle-sidebar"
+          onClick={onDarkToggle}
+          aria-label="Toggle dark mode"
+        >
+          {isDark ? (
+            <svg
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          )}
+        </button>
+      </div>
     </aside>
   );
 }

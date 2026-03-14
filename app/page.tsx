@@ -45,6 +45,21 @@ export default function Home() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isDark, setIsDark] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [plannerGroceryTrigger, setPlannerGroceryTrigger] = useState(0);
+  const [grocerySource, setGrocerySource] = useState<"selected" | "planner">(
+    "selected",
+  );
+  const [groceryRegenerate, setGroceryRegenerate] = useState(0);
+  const groceryIngredientSource =
+    grocerySource === "planner"
+      ? [...unscheduled, ...Object.values(weekData).flat()]
+          .filter((id, idx, arr) => arr.indexOf(id) === idx)
+          .map((id) => recipes.find((r) => r.id === id))
+          .filter(Boolean)
+          .flatMap((r) => r!.ingredients.map((ing) => `[${r!.title}] ${ing}`))
+      : recipes
+          .filter((r) => selectedRecipeIds.includes(r.id))
+          .flatMap((r) => r.ingredients.map((ing) => `[${r.title}] ${ing}`));
 
   useEffect(() => {
     // Init dark mode
@@ -144,9 +159,10 @@ export default function Home() {
     setIsLoading(true);
     setHasError("");
     const headers = await getAuthHeaders();
+    const autoTagging = localStorage.getItem("autoTagging") !== "false";
     const res = await fetch("/api/recipes", {
       method: "POST",
-      headers,
+      headers: { ...headers, "x-auto-tagging": String(autoTagging) },
       body: JSON.stringify({ url }),
     });
     const data = await res.json();
@@ -269,6 +285,8 @@ export default function Home() {
           activeCollectionId={activeCollectionId}
           isPlannerActive={isPlannerActive}
           isGroceryOpen={isGroceryOpen}
+          isDark={isDark}
+          grocerySource={grocerySource}
           onSelect={(id) => {
             setActiveCollectionId(id);
             setIsPlannerActive(false);
@@ -276,13 +294,17 @@ export default function Home() {
           onPlannerSelect={() => {
             setIsPlannerActive(true);
             setActiveCollectionId(null);
+            setIsGroceryOpen(false);
           }}
-          onGroceryOpen={() => {
+          onGroceryToggle={() => setIsGroceryOpen((p) => !p)}
+          onGroceryRegenerate={() => {
             setIsGroceryOpen(true);
-            setGroceryPanelKey((k) => k + 1);
+            setGroceryRegenerate((n) => n + 1);
           }}
+          onGrocerySourceChange={setGrocerySource}
           onCollectionsUpdated={setCollections}
           onSettingsOpen={() => setIsSettingsOpen(true)}
+          onDarkToggle={toggleDark}
         />
 
         <div className="main-content-wrapper">
@@ -379,10 +401,10 @@ export default function Home() {
 
       {isGroceryOpen && (
         <GroceryPanel
-          key={groceryPanelKey}
-          selectedRecipeIds={selectedRecipeIds}
-          recipes={recipes}
+          ingredientSource={groceryIngredientSource}
           onClose={() => setIsGroceryOpen(false)}
+          shouldRegenerate={groceryRegenerate}
+          isHidden={!isGroceryOpen}
         />
       )}
 
@@ -406,45 +428,6 @@ export default function Home() {
           Built by <strong>BasZak</strong>
         </p>
         <div className="footer-links">
-          <button
-            className="dark-toggle"
-            onClick={toggleDark}
-            aria-label="Toggle dark mode"
-          >
-            {isDark ? (
-              <svg
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" />
-                <line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-            ) : (
-              <svg
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            )}
-          </button>
           <a
             href="https://www.linkedin.com/in/basem-zaky-450733312/"
             target="_blank"

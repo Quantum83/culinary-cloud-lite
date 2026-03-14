@@ -54,7 +54,7 @@ export default function RecipeCard({
   onNotesSaved,
 }: RecipeCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState<number>(1);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notesText, setNotesText] = useState(recipe.notes || "");
   const [isSavingNotes, setIsSavingNotes] = useState(false);
@@ -256,6 +256,7 @@ export default function RecipeCard({
           rel="noopener noreferrer"
         >
           {recipe.title}
+          <span className="recipe-title-arrow">↗</span>
         </a>
       </div>
       <hr className="recipe-divider" />
@@ -279,13 +280,13 @@ export default function RecipeCard({
         {isOpen && (
           <>
             <div className="scale-controls">
-              {[1, 2, 3].map((s) => (
+              {[0.5, 1, 2, 3].map((s) => (
                 <button
                   key={s}
-                  className={`scale-btn ${scale === s ? "active" : ""}`}
+                  className={`scale-btn ${s === 0.5 ? "scale-btn-half" : ""} ${scale === s ? "active" : ""}`}
                   onClick={() => setScale(s)}
                 >
-                  {s}x
+                  {s === 0.5 ? "½" : `${s}x`}
                 </button>
               ))}
             </div>

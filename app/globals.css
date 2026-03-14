@@ -46,7 +46,18 @@ html.dark .collection-picker,
 html.dark .list-row,
 html.dark .grid-card,
 html.dark .view-btn,
-html.dark .multiselect-btn,
+html.dark .multiselect-btn {
+  background: #424769;
+  border-color: #5a6080;
+  color: #e8d8f0;
+}
+
+html.dark .view-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #2d3250;
+}
+
 html.dark .sort-select,
 html.dark .search-input {
   background: #424769;
@@ -56,6 +67,8 @@ html.dark .search-input {
 
 html.dark .sort-select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e8d8f0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
 }
 
 html.dark .recipe-preview::after {
@@ -90,6 +103,11 @@ html.dark .scale-btn {
   background: #424769;
   border-color: #5a6080;
   color: #e8d8f0;
+}
+html.dark .scale-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #2d3250;
 }
 html.dark .notes-display {
   border-color: #5a6080;
@@ -188,6 +206,24 @@ html.dark .settings-gear-btn {
 }
 html.dark .sidebar-label {
   color: var(--gold);
+}
+html.dark .sidebar-bottom-row {
+  border-color: #5a6080;
+}
+html.dark .settings-gear-btn {
+  color: #c0a8d0;
+  border-color: #5a6080;
+}
+html.dark .settings-gear-btn:hover {
+  background: #4e5480;
+  color: var(--accent);
+}
+html.dark .dark-toggle-sidebar {
+  color: #c0a8d0;
+}
+html.dark .dark-toggle-sidebar:hover {
+  background: #4e5480;
+  color: var(--accent);
 }
 
 /* ── Layout ── */
@@ -413,29 +449,63 @@ html.dark .sidebar-label {
   cursor: pointer;
   font-family: "Lato", sans-serif;
 }
+.sidebar-bottom-row {
+  display: flex;
+  align-items: stretch;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #e0cfc0;
+  margin-top: 4px;
+  transition: border-color 0.2s;
+}
+.sidebar-bottom-row:hover {
+  border-color: var(--accent);
+}
 
-/* ── Settings gear ── */
 .settings-gear-btn {
+  flex: 3;
   display: flex;
   align-items: center;
   gap: 8px;
   background: none;
-  border: 1.5px solid #e0cfc0;
-  border-radius: 8px;
+  border: none;
+  border-right: 1.5px solid #e0cfc0;
   padding: 8px 10px;
   font-size: 12px;
   color: #6b4a5e;
   cursor: pointer;
   font-family: "Lato", sans-serif;
   font-weight: 700;
-  transition: all 0.2s;
-  margin-top: 4px;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .settings-gear-btn:hover {
-  border-color: var(--accent);
+  background: #f0e4d4;
   color: var(--accent);
-  transform: scale(1.02);
 }
+
+.dark-toggle-sidebar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b4a5e;
+  padding: 8px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  font-family: "Lato", sans-serif;
+}
+.dark-toggle-sidebar:hover {
+  background: #f0e4d4;
+  color: var(--accent);
+}
+
+/* ── Settings gear ── */
 .settings-gear-label {
   font-size: 11px;
   letter-spacing: 1px;
@@ -562,6 +632,10 @@ html.dark .sidebar-label {
   flex: 1;
   display: block;
 }
+.theme-preset-swatch.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
 .theme-inputs {
   display: flex;
   flex-direction: column;
@@ -606,6 +680,39 @@ html.dark .sidebar-label {
 }
 .theme-hex-input:focus {
   border-color: var(--accent);
+}
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settings-toggle-label {
+  font-size: 11px;
+  color: #6b4a5e;
+  font-weight: 700;
+}
+.settings-toggle-btn {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1.5px solid #e0cfc0;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  transition: all 0.2s;
+}
+.settings-toggle-btn.on {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.settings-toggle-btn.off {
+  background: none;
+  color: #a65a6e;
+}
+html.dark .settings-toggle-label {
+  color: #c0a8d0;
 }
 
 /* ── Main content ── */
@@ -1093,6 +1200,7 @@ html.dark .sidebar-label {
   overflow: hidden;
   cursor: pointer;
   height: 180px;
+  transform: translateZ(0);
 }
 .recipe-image-bg {
   position: absolute;
@@ -1335,12 +1443,28 @@ html.dark .sidebar-label {
   font-size: 20px;
   color: var(--primary);
   text-decoration: none;
-  display: block;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
   line-height: 1.3;
   flex: 1;
+  transition: color 0.2s;
 }
 .recipe-title:hover {
   color: var(--accent);
+}
+.recipe-title-arrow {
+  font-size: 13px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+  flex-shrink: 0;
+}
+.recipe-title:hover .recipe-title-arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 .recipe-divider {
   border: none;
@@ -1414,6 +1538,9 @@ html.dark .sidebar-label {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
+}
+.scale-btn-half {
+  font-size: 11px;
 }
 .recipe-columns {
   display: grid;
@@ -1785,6 +1912,185 @@ html.dark .sidebar-label {
   transform: none !important;
 }
 
+/* ── Grocery sidebar widget ── */
+.grocery-sidebar-widget {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: visible;
+  position: relative;
+}
+
+.grocery-sidebar-row {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid #e0cfc0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.grocery-sidebar-row {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid #e0cfc0;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.grocery-sidebar-main {
+  flex: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  border-right: 1.5px solid #e0cfc0;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b4a5e;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  text-align: left;
+}
+.grocery-sidebar-main:hover {
+  background: #f0e4d4;
+  color: var(--accent);
+}
+.grocery-sidebar-main.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.grocery-sidebar-main.active + .grocery-sidebar-regen {
+  border-color: var(--primary);
+}
+
+.grocery-sidebar-regen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b4a5e;
+  padding: 8px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.grocery-sidebar-regen:hover {
+  background: #f0e4d4;
+  color: var(--accent);
+}
+
+.grocery-source-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  padding: 3px 0;
+  cursor: pointer;
+  color: white;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0 0 6px 6px;
+  position: relative;
+  z-index: 1;
+}
+.grocery-source-chevron:hover {
+  opacity: 1;
+}
+.grocery-source-chevron svg {
+  transition: transform 0.25s ease;
+}
+.grocery-source-chevron.open svg {
+  transform: rotate(180deg);
+}
+
+.grocery-source-dropdown {
+  background: var(--accent);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.25s ease;
+  border-radius: 0;
+  margin-top: 0;
+}
+.grocery-source-dropdown.open {
+  max-height: 120px;
+}
+
+.grocery-source-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 12px 4px;
+}
+.grocery-source-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  transition: background 0.15s;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.grocery-source-option:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.grocery-source-option.selected {
+  background: rgba(255, 255, 255, 0.2);
+}
+.grocery-source-option.selected::before {
+  content: "✓ ";
+  font-size: 11px;
+}
+
+.pool-empty {
+  font-size: 12px;
+  color: #c4a898;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* Dark mode grocery widget */
+html.dark .grocery-sidebar-row {
+  border-color: #5a6080;
+}
+html.dark .grocery-sidebar-main {
+  color: #c0a8d0;
+  border-color: #5a6080;
+}
+html.dark .grocery-sidebar-main:hover {
+  background: #4e5480;
+  color: var(--accent);
+}
+html.dark .grocery-sidebar-regen {
+  color: #c0a8d0;
+}
+html.dark .grocery-sidebar-regen:hover {
+  background: #4e5480;
+  color: var(--accent);
+}
+
 /* ── Grocery panel ── */
 .grocery-panel {
   position: fixed;
@@ -1803,6 +2109,9 @@ html.dark .sidebar-label {
 }
 .grocery-minimized {
   max-height: none;
+}
+.grocery-panel-hidden {
+  display: none !important;
 }
 .grocery-panel-header {
   display: flex;

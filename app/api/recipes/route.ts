@@ -164,19 +164,22 @@ export async function POST(req: NextRequest) {
   }
 
   let tags: string[] = [];
-  try {
-    const tagText = await callClaude(
-      `Given this recipe title and ingredients, assign 2-4 short tags from these categories ONLY:
+  const autoTaggingHeader = req.headers.get("x-auto-tagging");
+  if (autoTaggingHeader !== "false") {
+    try {
+      const tagText = await callClaude(
+        `Given this recipe title and ingredients, assign 2-4 short tags from these categories ONLY:
 breakfast, lunch, dinner, dessert, snack, vegetarian, vegan, quick, baking, healthy, comfort food, italian, mexican, asian, american, chocolate, cookies, cake, soup, salad, pasta
 
 Title: ${title}
 Ingredients: ${ingredients.slice(0, 10).join(", ")}
 
 Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italian", "quick"]`,
-    );
-    tags = JSON.parse(tagText.replace(/```json|```/g, "").trim());
-  } catch {
-    tags = [];
+      );
+      tags = JSON.parse(tagText.replace(/```json|```/g, "").trim());
+    } catch {
+      tags = [];
+    }
   }
 
   const userId = await getUserId(req);

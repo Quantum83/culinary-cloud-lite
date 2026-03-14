@@ -124,23 +124,37 @@ function ThemeSection({
   isActive: boolean;
 }) {
   const [vars, setVars] = useState<ThemeVars>(presets[0].vars);
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(storageKey);
-      if (saved) setVars(JSON.parse(saved));
+      if (saved) {
+        const savedVars = JSON.parse(saved);
+        setVars(savedVars);
+        const match = presets.find(
+          (p) =>
+            p.vars.bg === savedVars.bg &&
+            p.vars.primary === savedVars.primary &&
+            p.vars.accent === savedVars.accent &&
+            p.vars.gold === savedVars.gold,
+        );
+        setSelectedPreset(match?.name ?? null);
+      }
     } catch {}
   }, [storageKey]);
 
   function update(key: keyof ThemeVars, value: string) {
     const newVars = { ...vars, [key]: value };
     setVars(newVars);
+    setSelectedPreset(null);
     localStorage.setItem(storageKey, JSON.stringify(newVars));
     if (isActive) applyThemeVars(newVars);
   }
 
-  function applyPreset(preset: ThemeVars) {
+  function applyPreset(preset: ThemeVars, name: string) {
     setVars(preset);
+    setSelectedPreset(name);
     localStorage.setItem(storageKey, JSON.stringify(preset));
     if (isActive) applyThemeVars(preset);
   }
@@ -162,8 +176,8 @@ function ThemeSection({
         {presets.map((preset) => (
           <button
             key={preset.name}
-            className="theme-preset-swatch"
-            onClick={() => applyPreset(preset.vars)}
+            className={`theme-preset-swatch ${selectedPreset === preset.name ? "selected" : ""}`}
+            onClick={() => applyPreset(preset.vars, preset.name)}
             title={preset.name}
             aria-label={`Apply ${preset.name} preset`}
           >
@@ -212,6 +226,10 @@ export default function SettingsSidebar({
   onClose,
 }: SettingsSidebarProps) {
   const [isDark, setIsDark] = useState(false);
+  const [autoTagging, setAutoTagging] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("autoTagging") !== "false";
+  });
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -249,7 +267,7 @@ export default function SettingsSidebar({
       />
       <aside className="settings-sidebar" aria-label="Theme settings">
         <div className="settings-header">
-          <p className="settings-title">Theme Settings</p>
+          <p className="settings-title">Settings</p>
           <button
             className="settings-close"
             onClick={onClose}
@@ -271,6 +289,23 @@ export default function SettingsSidebar({
             storageKey={STORAGE_KEY_DARK}
             isActive={isDark}
           />
+          <div className="theme-section">
+            <p className="theme-section-title">Features</p>
+            <div className="settings-toggle-row">
+              <span className="settings-toggle-label">Auto-tagging</span>
+              <button
+                className={`settings-toggle-btn ${autoTagging ? "on" : "off"}`}
+                onClick={() => {
+                  const next = !autoTagging;
+                  setAutoTagging(next);
+                  localStorage.setItem("autoTagging", String(next));
+                }}
+                aria-label="Toggle auto-tagging"
+              >
+                {autoTagging ? "ON" : "OFF"}
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
     </>
