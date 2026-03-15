@@ -9,6 +9,7 @@ import GroceryPanel from "@/components/GroceryPanel";
 import CompareModal from "@/components/CompareModal";
 import MealPlanner from "@/components/MealPlanner";
 import SettingsSidebar, { applyThemeVars } from "@/components/SettingsSidebar";
+import OnboardingModal from "@/components/OnboardingModal";
 
 type Recipe = {
   id: string;
@@ -499,6 +500,7 @@ export default function Home() {
           </a>
         </div>
       </footer>
+      <OnboardingModal />
     </>
   );
 }
