@@ -1,34 +1,40 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Culinary Cloud",
-  description: "Save and organize your favorite recipes.",
+  title: "Culinary Cloud — Your Personal AI Cookbook",
+  description:
+    "Save recipes from anywhere on the web, build smart grocery lists, plan your meals, and keep your kitchen organized — all in one place.",
+  metadataBase: new URL("https://www.culinary-cloud.com"),
+  openGraph: {
+    title: "Culinary Cloud — Your Personal AI Cookbook",
+    description:
+      "Save recipes from anywhere on the web, build smart grocery lists, plan your meals, and keep your kitchen organized.",
+    url: "https://www.culinary-cloud.com",
+    siteName: "Culinary Cloud",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Culinary Cloud — Your Personal AI Cookbook",
+    description:
+      "Save recipes from anywhere on the web, build smart grocery lists, and plan your meals.",
+    creator: "@BasZak25",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

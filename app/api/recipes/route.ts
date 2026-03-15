@@ -76,6 +76,24 @@ export async function POST(req: NextRequest) {
   let ingredients: string[] = [];
   let instructions: string[] = [];
   let imageUrl: string | null = null;
+  let prepTime: string | null = null;
+  let cookTime: string | null = null;
+  let totalTime: string | null = null;
+  let recipeYield: string | null = null;
+  let description: string | null = null;
+
+  // helper to convert ISO 8601 duration to readable string
+  function parseDuration(iso: string): string | null {
+    if (!iso) return null;
+    const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+    if (!match) return null;
+    const hours = match[1] ? parseInt(match[1]) : 0;
+    const mins = match[2] ? parseInt(match[2]) : 0;
+    if (hours && mins) return `${hours} hr ${mins} min`;
+    if (hours) return `${hours} hr`;
+    if (mins) return `${mins} min`;
+    return null;
+  }
 
   let sourceDomain = "";
   try {
@@ -132,6 +150,15 @@ export async function POST(req: NextRequest) {
                 ? data.image[0]
                 : data.image.url;
         }
+        prepTime = parseDuration(data.prepTime) ?? null;
+        cookTime = parseDuration(data.cookTime) ?? null;
+        totalTime = parseDuration(data.totalTime) ?? null;
+        recipeYield = Array.isArray(data.recipeYield)
+          ? data.recipeYield[0]
+          : (data.recipeYield ?? null);
+        description = data.description
+          ? $("<div>").html(data.description).text().slice(0, 300)
+          : null;
       }
     } catch {
       /* skip */
@@ -194,6 +221,11 @@ Reply with ONLY a JSON array of tags, no other text. Example: ["dinner", "italia
       source_domain: sourceDomain,
       tags,
       user_id: userId,
+      prep_time: prepTime,
+      cook_time: cookTime,
+      total_time: totalTime,
+      recipe_yield: recipeYield,
+      description,
     })
     .select()
     .single();

@@ -25,35 +25,44 @@ const LIGHT_PRESETS: { name: string; vars: ThemeVars }[] = [
     },
   },
   {
-    name: "Sage",
+    name: "Warm Neutral",
     vars: {
-      bg: "#f0f4ef",
-      primary: "#3a5a40",
-      accent: "#6a9e6f",
-      gold: "#a0b87a",
+      bg: "#F9F8F6",
+      primary: "#415E72",
+      accent: "#B77466",
+      gold: "#D1A980",
     },
   },
   {
-    name: "Lavender",
+    name: "Sage Garden",
     vars: {
-      bg: "#f3f0f9",
-      primary: "#4a3f6b",
-      accent: "#7c6baa",
-      gold: "#b49fcc",
+      bg: "#F7F4EA",
+      primary: "#748873",
+      accent: "#B87C4C",
+      gold: "#D1A980",
     },
   },
   {
-    name: "Rose",
+    name: "Dusty Rose",
     vars: {
-      bg: "#fdf0f2",
-      primary: "#7a3048",
-      accent: "#c4637a",
-      gold: "#d4956a",
+      bg: "#F3F4F4",
+      primary: "#853953",
+      accent: "#B77466",
+      gold: "#D6A99D",
     },
   },
 ];
 
 const DARK_PRESETS: { name: string; vars: ThemeVars }[] = [
+  {
+    name: "Deep Ocean",
+    vars: {
+      bg: "#17313E",
+      primary: "#9BB4C0",
+      accent: "#86B0BD",
+      gold: "#E1D0B3",
+    },
+  },
   {
     name: "Blue Night",
     vars: {
@@ -64,30 +73,21 @@ const DARK_PRESETS: { name: string; vars: ThemeVars }[] = [
     },
   },
   {
-    name: "Deep Plum",
+    name: "Forest Night",
     vars: {
-      bg: "#1e1518",
-      primary: "#c9a8c0",
-      accent: "#e8855a",
-      gold: "#e8b06a",
+      bg: "#2C2C2C",
+      primary: "#A8BBA3",
+      accent: "#748873",
+      gold: "#ECE7D1",
     },
   },
   {
-    name: "Forest",
+    name: "Dark Plum",
     vars: {
-      bg: "#1a2420",
-      primary: "#7ec8a0",
-      accent: "#5aaa78",
-      gold: "#a8c870",
-    },
-  },
-  {
-    name: "Espresso",
-    vars: {
-      bg: "#322C2B",
-      primary: "#E4C59E",
-      accent: "#AF8260",
-      gold: "#c4a060",
+      bg: "#612D53",
+      primary: "#C5B0CD",
+      accent: "#D6A99D",
+      gold: "#FFE1AF",
     },
   },
 ];
@@ -171,6 +171,9 @@ function ThemeSection({
       <p className="theme-section-title">
         {title}
         {isActive && <span className="theme-active-badge">Active</span>}
+        {selectedPreset && (
+          <span className="theme-preset-name">{selectedPreset}</span>
+        )}
       </p>
       <div className="theme-presets">
         {presets.map((preset) => (

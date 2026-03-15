@@ -21,6 +21,11 @@ type Recipe = {
   tags: string[];
   notes: string | null;
   created_at: string;
+  prep_time: string | null;
+  cook_time: string | null;
+  total_time: string | null;
+  recipe_yield: string | null;
+  description: string | null;
 };
 type Collection = { id: string; name: string; recipe_ids: string[] };
 type WeekData = Record<string, string[]>;
@@ -77,12 +82,12 @@ export default function Home() {
         applyThemeVars(JSON.parse(savedTheme));
       } catch {}
     } else if (savedDark) {
-      // Apply blue-purple default for dark
+      // Apply Deep Ocean default for dark
       applyThemeVars({
-        bg: "#2D3250",
-        primary: "#F6B17A",
-        accent: "#F6B17A",
-        gold: "#E8B06A",
+        bg: "#17313E",
+        primary: "#9BB4C0",
+        accent: "#86B0BD",
+        gold: "#E1D0B3",
       });
     }
     initSession();
@@ -100,10 +105,10 @@ export default function Home() {
       } catch {}
     } else if (next) {
       applyThemeVars({
-        bg: "#2D3250",
-        primary: "#F6B17A",
-        accent: "#F6B17A",
-        gold: "#E8B06A",
+        bg: "#17313E",
+        primary: "#9BB4C0",
+        accent: "#86B0BD",
+        gold: "#E1D0B3",
       });
     } else {
       applyThemeVars({
@@ -467,6 +472,29 @@ export default function Home() {
             >
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+          </a>
+          <a
+            href="https://insigh.to/b/culinary-cloud-20"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Feedback"
+            className="footer-icon"
+            title="Give feedback"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
           </a>
         </div>

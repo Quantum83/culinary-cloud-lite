@@ -15,6 +15,11 @@ type Recipe = {
   tags: string[];
   notes: string | null;
   created_at: string;
+  prep_time: string | null;
+  cook_time: string | null;
+  total_time: string | null;
+  recipe_yield: string | null;
+  description: string | null;
 };
 
 function scaleIngredient(ingredient: string, scale: number): string {
@@ -260,6 +265,42 @@ export default function RecipeCard({
         </a>
       </div>
       <hr className="recipe-divider" />
+
+      {(recipe.prep_time ||
+        recipe.cook_time ||
+        recipe.total_time ||
+        recipe.recipe_yield) && (
+        <div className="recipe-meta">
+          {recipe.prep_time && (
+            <span className="recipe-meta-item">
+              <span className="recipe-meta-icon">⏱</span>
+              <span className="recipe-meta-label">Prep</span>
+              {recipe.prep_time}
+            </span>
+          )}
+          {recipe.cook_time && (
+            <span className="recipe-meta-item">
+              <span className="recipe-meta-icon">🔥</span>
+              <span className="recipe-meta-label">Cook</span>
+              {recipe.cook_time}
+            </span>
+          )}
+          {recipe.total_time && (
+            <span className="recipe-meta-item">
+              <span className="recipe-meta-icon">⏰</span>
+              <span className="recipe-meta-label">Total</span>
+              {recipe.total_time}
+            </span>
+          )}
+          {recipe.recipe_yield && (
+            <span className="recipe-meta-item">
+              <span className="recipe-meta-icon">🍽</span>
+              <span className="recipe-meta-label">Yield</span>
+              {recipe.recipe_yield}
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="recipe-details">
         {!isOpen && (

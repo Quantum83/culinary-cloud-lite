@@ -27,11 +27,13 @@ body {
     color 0.3s;
 }
 
+/*-Dark Theme-*/
 html.dark body {
-  color: #e8d8f0;
+  color: #e8e0f0;
   background-color: var(--bg);
 }
 
+/* ── Surfaces ── */
 html.dark .recipe-card,
 html.dark .form-section,
 html.dark .compare-card,
@@ -46,184 +48,212 @@ html.dark .collection-picker,
 html.dark .list-row,
 html.dark .grid-card,
 html.dark .view-btn,
-html.dark .multiselect-btn {
-  background: #424769;
-  border-color: #5a6080;
-  color: #e8d8f0;
-}
-
-html.dark .view-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #2d3250;
+html.dark .multiselect-btn,
+html.dark .scale-btn {
+  background: color-mix(in srgb, var(--bg) 70%, white 30%);
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 
 html.dark .sort-select,
-html.dark .search-input {
-  background: #424769;
-  border-color: #5a6080;
-  color: #e8d8f0;
+html.dark .search-input,
+html.dark .form-input,
+html.dark .notes-textarea,
+html.dark .new-collection-input,
+html.dark .collection-picker-input,
+html.dark .theme-hex-input {
+  background: color-mix(in srgb, var(--bg) 70%, white 30%);
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 
+html.dark .theme-hex-input {
+  background: var(--bg);
+}
+
+html.dark .collections-sidebar {
+  background: color-mix(in srgb, var(--bg) 80%, white 20%);
+}
+html.dark .settings-sidebar {
+  background: color-mix(in srgb, var(--bg) 80%, white 20%);
+}
+html.dark .theme-section {
+  background: color-mix(in srgb, var(--bg) 70%, white 30%);
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .footer {
+  background: var(--bg);
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+
+html.dark .notes-display {
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .notes-display:hover {
+  background: color-mix(in srgb, var(--bg) 70%, white 30%);
+}
+html.dark .recipe-tag {
+  background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .recipe-divider {
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .notes-section {
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .collection-count {
+  background: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .cancel-delete-btn {
+  background: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .sidebar-bottom-row {
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .grocery-sidebar-row {
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .deselect-btn {
+  background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+
+/* ── Hover states ── */
+html.dark .multiselect-item:hover,
+html.dark .tag-dropdown-item:hover,
+html.dark .collection-picker-item:hover {
+  background: color-mix(in srgb, var(--bg) 40%, white 60%);
+}
+html.dark .collection-item:hover {
+  background: color-mix(in srgb, var(--bg) 40%, white 60%);
+  transform: scale(1.02);
+}
+html.dark .settings-gear-btn:hover,
+html.dark .dark-toggle-sidebar:hover,
+html.dark .grocery-sidebar-main:hover,
+html.dark .grocery-sidebar-regen:hover {
+  background: color-mix(in srgb, var(--bg) 40%, white 60%);
+  color: var(--accent);
+}
+html.dark .deselect-btn:hover {
+  background: color-mix(in srgb, var(--bg) 40%, white 60%);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Active states ── */
+html.dark .view-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+html.dark .scale-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+html.dark .compare-btn {
+  background: color-mix(in srgb, var(--primary) 60%, black 40%);
+}
+html.dark .add-collection-btn {
+  background: color-mix(in srgb, var(--gold) 60%, black 40%);
+}
+html.dark .add-planner-btn {
+  background: color-mix(in srgb, var(--primary) 60%, black 40%);
+}
+
+/* ── Gradient ── */
+html.dark .recipe-preview::after {
+  background: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--bg) 70%, white 30%)
+  );
+}
+
+/* ── Sort arrow ── */
 html.dark .sort-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e8d8f0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e8e0f0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
 }
 
-html.dark .recipe-preview::after {
-  background: linear-gradient(transparent, #424769);
-}
-html.dark .collections-sidebar {
-  background: #363b5e;
-  border-color: #5a6080;
-  color: #e8d8f0;
-}
-html.dark .footer {
-  background: var(--bg);
-  border-color: #5a6080;
-}
+/* ── Primary text ── */
 html.dark .ingredient-item,
 html.dark .instruction-item,
 html.dark .notes-text,
 html.dark .list-title,
 html.dark .grid-card-title,
-html.dark .recipe-title {
-  color: #e0c8d8;
+html.dark .recipe-title,
+html.dark .recipe-summary,
+html.dark .collection-item,
+html.dark .multiselect-item,
+html.dark .tag-dropdown-item,
+html.dark .collection-picker-item,
+html.dark .recipe-tag,
+html.dark .grocery-item,
+html.dark .scale-btn,
+html.dark .collection-count,
+html.dark .cancel-delete-btn,
+html.dark .deselect-btn,
+html.dark .multiselect-btn,
+html.dark .view-btn {
+  color: #e8e0f0;
 }
-html.dark .multiselect-item:hover,
-html.dark .tag-dropdown-item:hover,
-html.dark .collection-picker-item:hover {
-  background: #4e5480;
-}
-html.dark .collection-item:hover {
-  background: #4e5480;
-}
-html.dark .scale-btn {
-  background: #424769;
-  border-color: #5a6080;
-  color: #e8d8f0;
-}
-html.dark .scale-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #2d3250;
-}
-html.dark .notes-display {
-  border-color: #5a6080;
-}
-html.dark .notes-display:hover {
-  background: #424769;
-}
-html.dark .recipe-tag {
-  background: #4e5480;
-  border-color: #5a6080;
-  color: #e8d8f0;
-}
-html.dark .grocery-item {
-  color: #e8d8f0;
-}
-html.dark .grocery-breakdown-item {
-  color: #c0b0d0;
-}
-html.dark .ingredients-label {
-  color: var(--gold);
-}
-html.dark .header-subtitle {
-  color: #c0a8d0;
-}
-html.dark .empty-msg {
-  color: #c0a8d0;
-}
-html.dark .compare-btn {
-  background: #6a4a5e;
-}
-html.dark .add-collection-btn {
-  background: #5a5030;
-}
-html.dark .add-planner-btn {
-  background: #4a3a60;
-}
-html.dark .deselect-btn {
-  background: #3a3060;
-  border-color: #5a6080;
-  color: #e8d8f0;
-}
-html.dark .deselect-btn:hover {
-  background: #4a4070;
-  border-color: var(--accent);
-  color: var(--accent);
-}
+
+html.dark .sort-select,
+html.dark .search-input,
+html.dark .form-input,
 html.dark .notes-textarea,
 html.dark .new-collection-input,
 html.dark .collection-picker-input,
 html.dark .theme-hex-input {
-  background: #363b5e;
-  border-color: #5a6080;
-  color: #e8d8f0;
+  color: #e8e0f0;
 }
-html.dark .recipe-divider {
-  border-color: #5a6080;
+
+/* ── Secondary text ── */
+html.dark .theme-input-label,
+html.dark .theme-section-title,
+html.dark .settings-toggle-label,
+html.dark .sidebar-label,
+html.dark .settings-gear-btn,
+html.dark .dark-toggle-sidebar,
+html.dark .new-collection-btn,
+html.dark .grocery-sidebar-main,
+html.dark .grocery-sidebar-regen,
+html.dark .settings-gear-btn {
+  color: #c8d8e0;
 }
-html.dark .notes-section {
-  border-color: #5a6080;
-}
-html.dark .settings-sidebar {
-  background: #363b5e;
-  border-color: #5a6080;
-}
-html.dark .theme-section {
-  background: #424769;
-  border-color: #5a6080;
-}
-html.dark .theme-hex-input {
-  background: #2d3250;
-}
-html.dark .collection-count {
-  background: #4e5480;
-  color: #e8d8f0;
-}
-html.dark .cancel-delete-btn {
-  background: #4e5480;
-  color: #e8d8f0;
-}
-html.dark .day-empty {
-  color: #8080a0;
-}
-html.dark .planner-empty {
-  color: #c0a8d0;
-}
-html.dark .collection-item {
-  color: #e8d8f0;
-}
+
 html.dark .new-collection-btn {
-  color: #c0a8d0;
-  border-color: #5a6080;
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 html.dark .settings-gear-btn {
-  color: #c0a8d0;
-  border-color: #5a6080;
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+html.dark .grocery-sidebar-main {
+  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+}
+
+/* ── Muted text ── */
+html.dark .header-subtitle,
+html.dark .empty-msg,
+html.dark .day-empty,
+html.dark .planner-empty,
+html.dark .pool-empty,
+html.dark .notes-placeholder,
+html.dark .list-source,
+html.dark .grocery-breakdown-item {
+  color: #a0b8c0;
+}
+
+/* ── Gold accents ── */
+html.dark .ingredients-label {
+  color: var(--gold);
 }
 html.dark .sidebar-label {
   color: var(--gold);
 }
-html.dark .sidebar-bottom-row {
-  border-color: #5a6080;
-}
-html.dark .settings-gear-btn {
-  color: #c0a8d0;
-  border-color: #5a6080;
-}
-html.dark .settings-gear-btn:hover {
-  background: #4e5480;
-  color: var(--accent);
-}
-html.dark .dark-toggle-sidebar {
-  color: #c0a8d0;
-}
-html.dark .dark-toggle-sidebar:hover {
-  background: #4e5480;
-  color: var(--accent);
+html.dark .theme-preset-name {
+  color: #a0b8c0;
 }
 
 /* ── Layout ── */
@@ -635,6 +665,15 @@ html.dark .dark-toggle-sidebar:hover {
 .theme-preset-swatch.selected {
   border-color: var(--primary);
   box-shadow: 0 0 0 1px var(--primary);
+}
+.theme-preset-name {
+  font-size: 9px;
+  font-weight: 600;
+  color: #a65a6e;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+  font-style: italic;
+  text-transform: none;
 }
 .theme-inputs {
   display: flex;
@@ -1328,6 +1367,35 @@ html.dark .settings-toggle-label {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* ── Recipe metadata ── */
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.recipe-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #6b4a5e;
+}
+.recipe-meta-icon {
+  font-size: 13px;
+}
+.recipe-meta-label {
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-right: 2px;
+}
+html.dark .recipe-meta-item {
+  color: #c0a8d0;
 }
 
 /* ── Tags ── */
