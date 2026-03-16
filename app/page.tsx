@@ -27,6 +27,8 @@ type Recipe = {
   total_time: string | null;
   recipe_yield: string | null;
   description: string | null;
+  video_url: string | null;
+  video_id: string | null;
 };
 type Collection = { id: string; name: string; recipe_ids: string[] };
 type WeekData = Record<string, string[]>;
@@ -166,14 +168,23 @@ export default function Home() {
     setHasError("");
     const headers = await getAuthHeaders();
     const autoTagging = localStorage.getItem("autoTagging") !== "false";
+    const youtubeExtraction =
+      localStorage.getItem("youtubeExtraction") !== "false";
     const res = await fetch("/api/recipes", {
       method: "POST",
-      headers: { ...headers, "x-auto-tagging": String(autoTagging) },
+      headers: {
+        ...headers,
+        "x-auto-tagging": String(autoTagging),
+        "x-youtube-extraction": String(youtubeExtraction),
+      },
       body: JSON.stringify({ url }),
     });
     const data = await res.json();
     if (!res.ok) {
       setHasError(data.error || "Something went wrong");
+    } else if (data._duplicate) {
+      showToast(`You've already saved "${data.title}"`);
+      setUrl("");
     } else {
       setUrl("");
       setRecipes((prev) => [data, ...prev]);

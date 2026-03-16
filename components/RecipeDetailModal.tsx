@@ -19,6 +19,8 @@ type Recipe = {
   total_time: string | null;
   recipe_yield: string | null;
   description: string | null;
+  video_url: string | null;
+  video_id: string | null;
 };
 
 type RecipeDetailModalProps = {

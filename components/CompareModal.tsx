@@ -13,6 +13,13 @@ type Recipe = {
   tags: string[];
   notes: string | null;
   created_at: string;
+  prep_time: string | null;
+  cook_time: string | null;
+  total_time: string | null;
+  recipe_yield: string | null;
+  description: string | null;
+  video_url: string | null;
+  video_id: string | null;
 };
 
 type CompareModalProps = {

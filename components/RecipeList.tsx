@@ -21,6 +21,8 @@ type Recipe = {
   total_time: string | null;
   recipe_yield: string | null;
   description: string | null;
+  video_url: string | null;
+  video_id: string | null;
 };
 
 type RecipeListProps = {
@@ -245,7 +247,13 @@ export default function RecipeList({
                 onChange={() => onSelect(recipe.id)}
                 aria-label={`Select ${recipe.title}`}
               />
-              {recipe.image_url ? (
+              {recipe.video_id ? (
+                <img
+                  src={`https://img.youtube.com/vi/${recipe.video_id}/mqdefault.jpg`}
+                  alt={recipe.title}
+                  className="list-thumb"
+                />
+              ) : recipe.image_url ? (
                 <img
                   src={recipe.image_url}
                   alt={recipe.title}
@@ -325,18 +333,30 @@ export default function RecipeList({
                 className="grid-card-image-wrapper"
                 onClick={() => onSelect(recipe.id)}
               >
-                {recipe.image_url ? (
+                {recipe.video_id || recipe.image_url ? (
                   <>
                     <div
                       className="recipe-image-bg"
-                      style={{ backgroundImage: `url(${recipe.image_url})` }}
+                      style={{
+                        backgroundImage: `url(${recipe.video_id ? `https://img.youtube.com/vi/${recipe.video_id}/mqdefault.jpg` : recipe.image_url})`,
+                      }}
                     />
                     <img
-                      src={recipe.image_url}
+                      src={
+                        recipe.video_id
+                          ? `https://img.youtube.com/vi/${recipe.video_id}/mqdefault.jpg`
+                          : recipe.image_url!
+                      }
                       alt={recipe.title}
                       className="grid-card-image"
                       loading="lazy"
                     />
+                    {recipe.video_id && (
+                      <div className="source-badge">YouTube</div>
+                    )}
+                    {!recipe.video_id && recipe.source_domain && (
+                      <div className="source-badge">{recipe.source_domain}</div>
+                    )}
                   </>
                 ) : (
                   <div className="grid-card-no-image" />

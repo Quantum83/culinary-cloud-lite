@@ -20,7 +20,87 @@ type Recipe = {
   total_time: string | null;
   recipe_yield: string | null;
   description: string | null;
+  video_url: string | null;
+  video_id: string | null;
 };
+
+function VideoPlayer({
+  videoId,
+  onSelect,
+  onDelete,
+  isSelected,
+}: {
+  videoId: string;
+  onSelect: () => void;
+  onDelete: () => void;
+  isSelected: boolean;
+}) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+
+  return (
+    <div className="video-wrapper">
+      {isPlaying ? (
+        <iframe
+          className="video-iframe"
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          title="YouTube video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : (
+        <div
+          className="video-thumbnail-wrapper"
+          onClick={() => setIsPlaying(true)}
+        >
+          <img
+            src={thumbnail}
+            alt="Video thumbnail"
+            className="video-thumbnail"
+            loading="lazy"
+          />
+          <div className="video-play-btn" aria-label="Play video">
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="white">
+              <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.6)" />
+              <polygon points="10,8 18,12 10,16" fill="white" />
+            </svg>
+          </div>
+          <div className="source-badge">YouTube</div>
+        </div>
+      )}
+      <div className="video-actions">
+        <button
+          className={`video-select-btn ${isSelected ? "active" : ""}`}
+          onClick={onSelect}
+          aria-label="Select recipe"
+        >
+          {isSelected ? "✓ Selected" : "Select"}
+        </button>
+        <button
+          className="video-delete-btn"
+          onClick={onDelete}
+          aria-label="Delete recipe"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4h6v2" />
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function scaleIngredient(ingredient: string, scale: number): string {
   if (scale === 1) return ingredient;
@@ -93,7 +173,14 @@ export default function RecipeCard({
 
   return (
     <div className={`recipe-card ${isSelected ? "selected" : ""}`}>
-      {recipe.image_url ? (
+      {recipe.video_id ? (
+        <VideoPlayer
+          videoId={recipe.video_id}
+          onSelect={() => onSelect(recipe.id)}
+          onDelete={() => onDelete(recipe.id)}
+          isSelected={isSelected}
+        />
+      ) : recipe.image_url ? (
         <div
           className="recipe-image-wrapper"
           onClick={(e) => {
@@ -115,8 +202,6 @@ export default function RecipeCard({
           {recipe.source_domain && (
             <div className="source-badge">{recipe.source_domain}</div>
           )}
-
-          {/* Desktop overlay */}
           <div
             className={`recipe-image-overlay ${isSelected ? "overlay-checked" : ""}`}
           >
@@ -171,8 +256,6 @@ export default function RecipeCard({
               </button>
             </div>
           </div>
-
-          {/* Mobile always-visible actions */}
           <div className="mobile-image-actions">
             <button
               className={`mobile-action-btn mobile-select-btn ${isSelected ? "mobile-selected" : ""}`}

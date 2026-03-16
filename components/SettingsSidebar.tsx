@@ -233,6 +233,10 @@ export default function SettingsSidebar({
     if (typeof window === "undefined") return true;
     return localStorage.getItem("autoTagging") !== "false";
   });
+  const [youtubeExtraction, setYoutubeExtraction] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("youtubeExtraction") !== "false";
+  });
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -307,6 +311,22 @@ export default function SettingsSidebar({
               >
                 {autoTagging ? "ON" : "OFF"}
               </button>
+              <div className="settings-toggle-row">
+                <span className="settings-toggle-label">
+                  YouTube extraction
+                </span>
+                <button
+                  className={`settings-toggle-btn ${youtubeExtraction ? "on" : "off"}`}
+                  onClick={() => {
+                    const next = !youtubeExtraction;
+                    setYoutubeExtraction(next);
+                    localStorage.setItem("youtubeExtraction", String(next));
+                  }}
+                  aria-label="Toggle YouTube extraction"
+                >
+                  {youtubeExtraction ? "ON" : "OFF"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
