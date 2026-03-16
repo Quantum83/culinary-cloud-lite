@@ -1590,8 +1590,8 @@ html.dark .recipe-meta-item {
   background: #fff;
   border: 1.5px solid #e0cfc0;
   border-radius: 20px;
-  padding: 3px 12px;
-  font-size: 12px;
+  padding: 4px 14px;
+  font-size: 13px;
   font-weight: 700;
   color: #6b4a5e;
   cursor: pointer;
@@ -1608,7 +1608,7 @@ html.dark .recipe-meta-item {
   color: white;
 }
 .scale-btn-half {
-  font-size: 11px;
+  font-size: 15px;
 }
 .recipe-columns {
   display: grid;

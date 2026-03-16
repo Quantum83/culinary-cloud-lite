@@ -332,7 +332,7 @@ export default function Home() {
                     <input
                       className="form-input"
                       type="url"
-                      placeholder="https://www.preppykitchen.com/recipe/..."
+                      placeholder="https://example-website.com/your-recipe..."
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       required
