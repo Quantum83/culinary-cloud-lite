@@ -34,6 +34,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "1762e98699a44b7db19bd9188fcef9fe"}'
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
