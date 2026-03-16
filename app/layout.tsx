@@ -2,23 +2,25 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Culinary Cloud | Your Personal AI Cookbook",
+  title: "Culinary Cloud — Free AI Recipe Manager & Cookbook",
   description:
-    "Save recipes from anywhere on the web, build smart grocery lists, plan your meals, and keep your kitchen organized, all in one place.",
+    "Save recipes from any website, compare recipes side by side with AI, plan your meals, and generate smart grocery lists. Free, no account needed.",
+  keywords:
+    "recipe manager, recipe organizer, save recipes, recipe comparison, meal planner, grocery list, AI cookbook, recipe saver, online cookbook",
   metadataBase: new URL("https://www.culinary-cloud.com"),
   openGraph: {
-    title: "Culinary Cloud | Your Personal AI Cookbook",
+    title: "Culinary Cloud — Free AI Recipe Manager & Cookbook",
     description:
-      "Save recipes from anywhere on the web, build smart grocery lists, plan your meals, and keep your kitchen organized.",
+      "Save recipes from any website, compare recipes side by side with AI, plan your meals, and generate smart grocery lists. Free, no account needed.",
     url: "https://www.culinary-cloud.com",
     siteName: "Culinary Cloud",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Culinary Cloud | Your Personal AI Cookbook",
+    title: "Culinary Cloud — Free AI Recipe Manager & Cookbook",
     description:
-      "Save recipes from anywhere on the web, build smart grocery lists, and plan your meals.",
+      "Save recipes from any website, compare recipes side by side with AI, plan your meals, and generate smart grocery lists.",
     creator: "@BasZak25",
   },
   robots: {
