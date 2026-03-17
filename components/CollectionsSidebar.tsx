@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getAuthHeaders } from "@/lib/supabase";
-import type { Collection } from "@/types";
+import type { Collection, AuthUser } from "@/types";
 
 type CollectionsSidebarProps = {
   collections: Collection[];
@@ -11,6 +11,7 @@ type CollectionsSidebarProps = {
   isGroceryOpen: boolean;
   isDark: boolean;
   grocerySource: "selected" | "planner";
+  user: AuthUser | null;
   onSelect: (id: string | null) => void;
   onPlannerSelect: () => void;
   onGroceryToggle: () => void;
@@ -19,6 +20,8 @@ type CollectionsSidebarProps = {
   onCollectionsUpdated: (collections: Collection[]) => void;
   onSettingsOpen: () => void;
   onDarkToggle: () => void;
+  onAuthClick: () => void;
+  onSignOut: () => void;
 };
 
 export default function CollectionsSidebar({
@@ -28,6 +31,7 @@ export default function CollectionsSidebar({
   isGroceryOpen,
   isDark,
   grocerySource,
+  user,
   onSelect,
   onPlannerSelect,
   onGroceryToggle,
@@ -36,6 +40,8 @@ export default function CollectionsSidebar({
   onCollectionsUpdated,
   onSettingsOpen,
   onDarkToggle,
+  onAuthClick,
+  onSignOut,
 }: CollectionsSidebarProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState("");
@@ -246,6 +252,33 @@ export default function CollectionsSidebar({
           </svg>
         </button>
       </div>
+
+      <hr className="sidebar-divider" />
+      <p className="sidebar-label">Account</p>
+
+      {user && !user.isAnonymous ? (
+        <div className="sidebar-account-card">
+          <div className="sidebar-account-row">
+            <div className="sidebar-account-avatar">
+              {user.email ? user.email[0] : "?"}
+            </div>
+            <div className="sidebar-account-details">
+              <div className="sidebar-account-email">{user.email}</div>
+              <div className="sidebar-account-status">
+                <span>✓</span> Synced
+              </div>
+            </div>
+          </div>
+          <button className="sidebar-signout-btn" onClick={onSignOut}>
+            Sign Out
+          </button>
+        </div>
+      ) : (
+        <button className="sidebar-signin-btn" onClick={onAuthClick}>
+          <span>🔐</span>
+          Sign In / Sign Up
+        </button>
+      )}
 
       <div className="sidebar-bottom-row">
         <button

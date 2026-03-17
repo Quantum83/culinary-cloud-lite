@@ -28,152 +28,230 @@ body {
 }
 
 /*-Dark Theme-*/
+html.dark {
+  --surface: color-mix(in srgb, var(--bg) 85%, white 15%);
+  --raised: color-mix(in srgb, var(--bg) 75%, white 25%);
+  --border: color-mix(in srgb, var(--bg) 70%, white 30%);
+  --text: color-mix(in srgb, var(--bg) 5%, white 95%);
+  --text-soft: color-mix(in srgb, var(--bg) 20%, white 80%);
+  --text-muted: color-mix(in srgb, var(--bg) 40%, white 60%);
+}
+
 html.dark body {
-  color: #e8e0f0;
+  color: var(--text);
   background-color: var(--bg);
 }
 
 /* ── Surfaces ── */
 html.dark .recipe-card,
-html.dark .form-section,
 html.dark .compare-card,
 html.dark .comparison-box,
 html.dark .day-column,
 html.dark .unscheduled-pool,
 html.dark .grocery-panel,
-html.dark .modal,
 html.dark .multiselect-dropdown,
 html.dark .tag-dropdown,
 html.dark .collection-picker,
 html.dark .list-row,
 html.dark .grid-card,
-html.dark .view-btn,
-html.dark .multiselect-btn,
-html.dark .scale-btn {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .theme-section {
+  background: var(--surface);
+  border-color: var(--border);
 }
 
-html.dark .sort-select,
-html.dark .search-input,
+html.dark .form-section {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+
+html.dark .collections-sidebar,
+html.dark .settings-sidebar {
+  background: var(--surface);
+}
+
+html.dark .modal {
+  background: var(--surface);
+}
+html.dark .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+html.dark .modal-header {
+  border-color: var(--border);
+}
+
+/* ── Inputs ── */
 html.dark .form-input,
+html.dark .search-input,
 html.dark .notes-textarea,
 html.dark .new-collection-input,
 html.dark .collection-picker-input,
-html.dark .theme-hex-input {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .auth-input,
+html.dark .theme-hex-input,
+html.dark .tag-input {
+  background: var(--raised);
+  border-color: var(--border);
+  color: var(--text);
+}
+html.dark .sort-select {
+  background-color: var(--raised);
+  border-color: var(--border);
+  color: var(--text);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+html.dark .form-input::placeholder,
+html.dark .search-input::placeholder,
+html.dark .auth-input::placeholder,
+html.dark .new-collection-input::placeholder,
+html.dark .collection-picker-input::placeholder,
+html.dark .notes-textarea::placeholder,
+html.dark .tag-input::placeholder {
+  color: var(--text-muted);
 }
 
-html.dark .theme-hex-input {
-  background: var(--bg);
+/* ── Interactive elements ── */
+html.dark .view-btn,
+html.dark .multiselect-btn,
+html.dark .scale-btn,
+html.dark .deselect-btn {
+  background: var(--raised);
+  border-color: var(--border);
+  color: var(--text);
+}
+html.dark .view-btn:hover,
+html.dark .multiselect-btn:hover,
+html.dark .scale-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+html.dark .deselect-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+html.dark .view-btn.active,
+html.dark .scale-btn.active,
+html.dark .multiselect-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+html.dark .compare-btn {
+  background: color-mix(in srgb, var(--primary) 80%, white 20%);
+}
+html.dark .add-collection-btn {
+  background: color-mix(in srgb, var(--gold) 80%, white 20%);
+}
+html.dark .add-planner-btn {
+  background: color-mix(in srgb, var(--primary) 80%, white 20%);
 }
 
-html.dark .collections-sidebar {
-  background: color-mix(in srgb, var(--bg) 80%, white 20%);
+/* ── Sidebar elements ── */
+html.dark .collection-item {
+  color: var(--text);
 }
-html.dark .settings-sidebar {
-  background: color-mix(in srgb, var(--bg) 80%, white 20%);
+html.dark .collection-item:hover {
+  background: var(--raised);
+  color: var(--text);
 }
-html.dark .theme-section {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .collection-item.active {
+  background: var(--primary);
+  color: var(--bg);
 }
-html.dark .footer {
-  background: var(--bg);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
-
-html.dark .notes-display {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
-html.dark .notes-display:hover {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-}
-html.dark .recipe-tag {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
-html.dark .recipe-divider {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
-html.dark .notes-section {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .collection-item.active .collection-count {
+  background: color-mix(in srgb, var(--primary) 70%, black 30%);
+  color: var(--bg);
 }
 html.dark .collection-count {
-  background: color-mix(in srgb, var(--bg) 50%, white 50%);
+  background: var(--raised);
+  color: var(--text);
 }
 html.dark .cancel-delete-btn {
-  background: color-mix(in srgb, var(--bg) 50%, white 50%);
+  background: var(--raised);
+  color: var(--text);
+}
+html.dark .new-collection-btn {
+  border-color: var(--border);
+  color: var(--accent);
+}
+html.dark .sidebar-divider {
+  border-color: var(--border);
 }
 html.dark .sidebar-bottom-row {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+  border-color: var(--border);
 }
+html.dark .settings-gear-btn {
+  color: var(--text);
+  border-color: var(--border);
+}
+html.dark .settings-gear-btn:hover {
+  background: var(--raised);
+  color: var(--accent);
+}
+html.dark .dark-toggle-sidebar {
+  color: var(--text);
+}
+html.dark .dark-toggle-sidebar:hover {
+  background: var(--raised);
+  color: var(--accent);
+}
+
+/* ── Sidebar grocery ── */
 html.dark .grocery-sidebar-row {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+  border-color: var(--border);
 }
-html.dark .deselect-btn {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .grocery-sidebar-main {
+  color: var(--text);
+  border-color: var(--border);
+}
+html.dark .grocery-sidebar-main:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+html.dark .grocery-sidebar-main.active {
+  background: var(--primary);
+  color: var(--bg);
+}
+html.dark .grocery-sidebar-regen {
+  color: var(--text);
+}
+html.dark .grocery-sidebar-regen:hover {
+  background: var(--raised);
+  color: var(--text);
 }
 
 /* ── Hover states ── */
 html.dark .multiselect-item:hover,
 html.dark .tag-dropdown-item:hover,
 html.dark .collection-picker-item:hover {
-  background: color-mix(in srgb, var(--bg) 40%, white 60%);
-}
-html.dark .collection-item:hover {
-  background: color-mix(in srgb, var(--bg) 40%, white 60%);
-  transform: scale(1.02);
-}
-html.dark .settings-gear-btn:hover,
-html.dark .dark-toggle-sidebar:hover,
-html.dark .grocery-sidebar-main:hover,
-html.dark .grocery-sidebar-regen:hover {
-  background: color-mix(in srgb, var(--bg) 40%, white 60%);
-  color: var(--accent);
-}
-html.dark .deselect-btn:hover {
-  background: color-mix(in srgb, var(--bg) 40%, white 60%);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--raised);
+  color: var(--text);
 }
 
-/* ── Active states ── */
-html.dark .view-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--bg);
-}
-html.dark .scale-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--bg);
-}
-html.dark .compare-btn {
-  background: color-mix(in srgb, var(--primary) 60%, black 40%);
-}
-html.dark .add-collection-btn {
-  background: color-mix(in srgb, var(--gold) 60%, black 40%);
-}
-html.dark .add-planner-btn {
-  background: color-mix(in srgb, var(--primary) 60%, black 40%);
+/* ── Footer ── */
+html.dark .footer {
+  background: var(--bg);
+  border-color: var(--border);
 }
 
-/* ── Gradient ── */
+/* ── Recipe card elements ── */
+html.dark .notes-display {
+  border-color: var(--border);
+}
+html.dark .notes-display:hover {
+  background: var(--raised);
+}
+html.dark .recipe-tag {
+  background: var(--raised);
+  border-color: var(--border);
+  color: var(--text);
+}
+html.dark .recipe-divider {
+  border-color: var(--border);
+}
+html.dark .notes-section {
+  border-color: var(--border);
+}
 html.dark .recipe-preview::after {
-  background: linear-gradient(
-    transparent,
-    color-mix(in srgb, var(--bg) 70%, white 30%)
-  );
-}
-
-/* ── Sort arrow ── */
-html.dark .sort-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e8e0f0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
+  background: linear-gradient(transparent, var(--surface));
 }
 
 /* ── Primary text ── */
@@ -184,53 +262,43 @@ html.dark .list-title,
 html.dark .grid-card-title,
 html.dark .recipe-title,
 html.dark .recipe-summary,
-html.dark .collection-item,
 html.dark .multiselect-item,
 html.dark .tag-dropdown-item,
 html.dark .collection-picker-item,
-html.dark .recipe-tag,
 html.dark .grocery-item,
-html.dark .scale-btn,
-html.dark .collection-count,
-html.dark .cancel-delete-btn,
-html.dark .deselect-btn,
-html.dark .multiselect-btn,
-html.dark .view-btn {
-  color: #e8e0f0;
+html.dark .modal-title,
+html.dark .recipe-meta-item {
+  color: var(--text);
 }
 
-html.dark .sort-select,
-html.dark .search-input,
-html.dark .form-input,
-html.dark .notes-textarea,
-html.dark .new-collection-input,
-html.dark .collection-picker-input,
-html.dark .theme-hex-input {
-  color: #e8e0f0;
+/* ── Labels ── */
+html.dark .ingredients-label,
+html.dark .sidebar-label {
+  color: var(--gold);
+}
+html.dark .theme-input-label,
+html.dark .theme-section-title {
+  color: var(--gold);
+}
+html.dark .settings-toggle-label {
+  color: var(--text);
+}
+html.dark .theme-preset-name {
+  color: var(--text-soft);
 }
 
 /* ── Secondary text ── */
-html.dark .theme-input-label,
-html.dark .theme-section-title,
-html.dark .settings-toggle-label,
-html.dark .sidebar-label,
-html.dark .settings-gear-btn,
-html.dark .dark-toggle-sidebar,
-html.dark .new-collection-btn,
-html.dark .grocery-sidebar-main,
-html.dark .grocery-sidebar-regen,
-html.dark .settings-gear-btn {
-  color: #c8d8e0;
+html.dark .modal-close {
+  color: var(--text-soft);
 }
-
-html.dark .new-collection-btn {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .modal-close:hover {
+  color: var(--accent);
 }
-html.dark .settings-gear-btn {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .settings-close {
+  color: var(--text-soft);
 }
-html.dark .grocery-sidebar-main {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
+html.dark .settings-close:hover {
+  color: var(--accent);
 }
 
 /* ── Muted text ── */
@@ -242,18 +310,204 @@ html.dark .pool-empty,
 html.dark .notes-placeholder,
 html.dark .list-source,
 html.dark .grocery-breakdown-item {
-  color: #a0b8c0;
+  color: var(--text-muted);
 }
 
-/* ── Gold accents ── */
-html.dark .ingredients-label {
-  color: var(--gold);
+/* ── Video ── */
+html.dark .video-select-btn {
+  border-color: var(--border);
+  color: var(--text);
 }
-html.dark .sidebar-label {
-  color: var(--gold);
+html.dark .video-delete-btn {
+  color: var(--text-soft);
 }
-html.dark .theme-preset-name {
-  color: #a0b8c0;
+html.dark .video-delete-btn:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* ── Auth modal ── */
+html.dark .auth-tabs {
+  background: var(--raised);
+}
+html.dark .auth-tab {
+  color: var(--text);
+}
+html.dark .auth-tab.active {
+  background: var(--primary);
+  color: var(--bg);
+}
+html.dark .google-auth-btn {
+  background: color-mix(in srgb, var(--bg) 10%, white 90%);
+  border-color: color-mix(in srgb, var(--bg) 5%, white 95%);
+  color: #1a1a2e;
+}
+html.dark .google-auth-btn:hover {
+  background: #fff;
+  border-color: var(--primary);
+  color: #1a1a2e;
+}
+html.dark .auth-divider {
+  color: var(--text-muted);
+}
+html.dark .auth-divider::before,
+html.dark .auth-divider::after {
+  border-color: var(--border);
+}
+html.dark .auth-field .form-label {
+  color: var(--text);
+}
+html.dark .auth-reassurance {
+  color: var(--text-soft);
+}
+html.dark .auth-password-hint {
+  color: var(--text-muted);
+}
+html.dark .auth-submit-btn {
+  background: var(--primary);
+  color: var(--bg);
+  font-weight: 700;
+}
+html.dark .auth-submit-btn:hover {
+  background: color-mix(in srgb, var(--primary) 70%, white 30%);
+  color: var(--bg);
+}
+html.dark .auth-submit-btn:disabled {
+  background: color-mix(in srgb, var(--primary) 50%, var(--bg) 50%);
+  color: var(--text-muted);
+}
+
+/* ── Sidebar account ── */
+html.dark .sidebar-account-card {
+  background: var(--raised);
+  border-color: var(--border);
+}
+html.dark .sidebar-account-email {
+  color: var(--text);
+}
+html.dark .sidebar-account-status {
+  color: color-mix(in srgb, var(--accent) 70%, white 30%);
+}
+html.dark .sidebar-account-avatar {
+  background: var(--accent);
+  color: #fff;
+}
+html.dark .sidebar-signout-btn {
+  border-color: var(--border);
+  color: var(--text-soft);
+}
+html.dark .sidebar-signout-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+html.dark .sidebar-signin-btn {
+  border-color: var(--accent);
+  color: #fff;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+html.dark .sidebar-signin-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Nudge ── */
+html.dark .auth-nudge-modal-text {
+  color: var(--text-soft);
+}
+html.dark .auth-nudge-modal-signup {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Onboarding ── */
+html.dark .ob-subtitle {
+  color: var(--text-soft);
+}
+html.dark .ob-modal {
+  background: var(--surface);
+}
+html.dark .ob-url-bar {
+  background: var(--raised);
+  border-color: var(--border);
+  color: var(--text);
+}
+html.dark .ob-recipe-card-mini,
+html.dark .ob-view-preview,
+html.dark .ob-scroll-card-full,
+html.dark .ob-card-mini-full,
+html.dark .ob-compare-card-mini,
+html.dark .ob-compare-result,
+html.dark .ob-recipe-stack,
+html.dark .ob-combined-item,
+html.dark .ob-folder,
+html.dark .ob-recipe-card-chip {
+  background: var(--raised);
+  border-color: var(--border);
+}
+html.dark .ob-tag,
+html.dark .ob-chip,
+html.dark .ob-raw-ingredient,
+html.dark .ob-mini-tag,
+html.dark .ob-view-tab {
+  background: var(--raised);
+  color: var(--text);
+}
+html.dark .ob-view-tab.active {
+  background: var(--primary);
+  color: var(--bg);
+}
+html.dark .ob-line {
+  background: var(--border);
+}
+html.dark .ob-list-row-mini,
+html.dark .ob-grid-card-mini,
+html.dark .ob-mini-day,
+html.dark .ob-sidebar-divider,
+html.dark .ob-app-layout-mini,
+html.dark .ob-nav {
+  border-color: var(--border);
+}
+html.dark .ob-card-mini-title,
+html.dark .ob-scroll-card-title,
+html.dark .ob-compare-card-title,
+html.dark .ob-stack-name,
+html.dark .ob-sidebar-item {
+  color: var(--text);
+}
+html.dark .ob-scroll-card-meta,
+html.dark .ob-stack-ingredient,
+html.dark .ob-compare-result-text {
+  color: var(--text-soft);
+}
+html.dark .ob-sidebar-mini {
+  background: color-mix(in srgb, var(--bg) 90%, white 10%);
+}
+html.dark .ob-save-bar-mini {
+  background: var(--raised);
+  border-color: var(--border);
+}
+html.dark .ob-nav-btn {
+  border-color: var(--border);
+  color: var(--text);
+}
+html.dark .ob-nav-btn:hover:not(:disabled) {
+  background: var(--raised);
+}
+html.dark .ob-dot-btn {
+  background: var(--border);
+}
+html.dark .ob-dot-btn.active {
+  background: var(--primary);
+}
+html.dark .ob-social-icon {
+  color: var(--text-soft);
+}
+html.dark .ob-social-icon:hover {
+  color: var(--primary);
+}
+html.dark .ob-folder,
+html.dark .ob-recipe-card-chip {
+  color: var(--text);
 }
 
 /* ── Layout ── */
@@ -750,9 +1004,6 @@ html.dark .theme-preset-name {
   background: none;
   color: #a65a6e;
 }
-html.dark .settings-toggle-label {
-  color: #c0a8d0;
-}
 
 /* ── Main content ── */
 .main-content {
@@ -868,6 +1119,14 @@ html.dark .settings-toggle-label {
   background: #c45e30;
   transform: scale(1.04) rotate(-0.5deg);
   box-shadow: 0 4px 16px rgba(220, 114, 67, 0.3);
+}
+html.dark .submit-btn {
+  background: var(--accent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+html.dark .submit-btn:hover {
+  background: color-mix(in srgb, var(--accent) 70%, white 30%);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 .submit-btn:disabled {
   background: #e0b89e;
@@ -1393,9 +1652,6 @@ html.dark .settings-toggle-label {
   text-transform: uppercase;
   color: var(--gold);
   margin-right: 2px;
-}
-html.dark .recipe-meta-item {
-  color: #c0a8d0;
 }
 
 /* ── Tags ── */
@@ -2067,17 +2323,6 @@ html.dark .recipe-meta-item {
   color: #ff6b6b;
   background: #fde8e0;
 }
-html.dark .video-select-btn {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #e8e0f0;
-}
-html.dark .video-delete-btn {
-  color: #a0b8c0;
-}
-html.dark .video-delete-btn:hover {
-  color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.1);
-}
 
 /* ── Grocery sidebar widget ── */
 .grocery-sidebar-widget {
@@ -2236,26 +2481,6 @@ html.dark .video-delete-btn:hover {
   color: #c4a898;
   font-style: italic;
   padding: 4px 0;
-}
-
-/* Dark mode grocery widget */
-html.dark .grocery-sidebar-row {
-  border-color: #5a6080;
-}
-html.dark .grocery-sidebar-main {
-  color: #c0a8d0;
-  border-color: #5a6080;
-}
-html.dark .grocery-sidebar-main:hover {
-  background: #4e5480;
-  color: var(--accent);
-}
-html.dark .grocery-sidebar-regen {
-  color: #c0a8d0;
-}
-html.dark .grocery-sidebar-regen:hover {
-  background: #4e5480;
-  color: var(--accent);
 }
 
 /* ── Grocery panel ── */
@@ -2797,13 +3022,6 @@ html.dark .grocery-sidebar-regen:hover {
   margin-bottom: 24px;
 }
 
-html.dark .ob-subtitle {
-  color: #a0b8c0;
-}
-html.dark .ob-modal {
-  background: color-mix(in srgb, var(--bg) 85%, white 15%);
-}
-
 .ob-animation-container {
   width: 100%;
   flex: 1;
@@ -2842,11 +3060,7 @@ html.dark .ob-modal {
   color: #3a2a38;
   transition: border-color 0.3s;
 }
-html.dark .ob-url-bar {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #e8e0f0;
-}
+
 .ob-url-bar.ob-typing {
   border-color: var(--accent);
 }
@@ -2906,10 +3120,7 @@ html.dark .ob-url-bar {
     opacity 0.3s,
     transform 0.3s;
 }
-html.dark .ob-recipe-card-mini {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
+
 .ob-recipe-card-mini.ob-pop-in {
   opacity: 1;
   transform: scale(1) translateY(0);
@@ -2946,10 +3157,7 @@ html.dark .ob-recipe-card-mini {
   font-weight: 700;
   color: #a65a6e;
 }
-html.dark .ob-tag {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-  color: #c8d8e0;
-}
+
 .ob-card-meta {
   font-size: 10px;
   color: #a65a6e;
@@ -3000,14 +3208,6 @@ html.dark .ob-tag {
   background: var(--primary);
   color: white;
 }
-html.dark .ob-view-tab {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-  color: #c8d8e0;
-}
-html.dark .ob-view-tab.active {
-  background: var(--primary);
-  color: var(--bg);
-}
 
 .ob-view-preview {
   width: 100%;
@@ -3017,10 +3217,6 @@ html.dark .ob-view-tab.active {
   border-radius: 10px;
   padding: 12px;
   min-height: 120px;
-}
-html.dark .ob-view-preview {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 
 .ob-scroll-preview {
@@ -3051,9 +3247,7 @@ html.dark .ob-view-preview {
   border-radius: 3px;
   background: #e8d8c4;
 }
-html.dark .ob-line {
-  background: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
+
 .ob-line-title {
   width: 80%;
 }
@@ -3076,9 +3270,7 @@ html.dark .ob-line {
   padding: 4px 0;
   border-bottom: 1px solid #f0e4d4;
 }
-html.dark .ob-list-row-mini {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
+
 .ob-mini-thumb {
   width: 24px;
   height: 24px;
@@ -3092,9 +3284,6 @@ html.dark .ob-list-row-mini {
   border-radius: 10px;
   background: #f5ede3;
 }
-html.dark .ob-mini-tag {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-}
 
 .ob-grid-preview {
   display: grid;
@@ -3106,9 +3295,7 @@ html.dark .ob-mini-tag {
   border-radius: 8px;
   overflow: hidden;
 }
-html.dark .ob-grid-card-mini {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
+
 .ob-mini-image-sq {
   width: 100%;
   height: 48px;
@@ -3142,11 +3329,7 @@ html.dark .ob-grid-card-mini {
   font-family: "Lato", sans-serif;
   transition: all 0.3s;
 }
-html.dark .ob-chip {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #c8d8e0;
-}
+
 .ob-chip-moving {
   transform: translateX(8px) scale(1.05);
   background: var(--accent);
@@ -3178,11 +3361,7 @@ html.dark .ob-chip {
   color: var(--primary);
   font-family: "Lato", sans-serif;
 }
-html.dark .ob-folder {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #e8e0f0;
-}
+
 .ob-folder-count {
   background: var(--primary);
   color: white;
@@ -3208,9 +3387,7 @@ html.dark .ob-folder {
   padding: 6px;
   min-height: 80px;
 }
-html.dark .ob-mini-day {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
+
 .ob-mini-day-label {
   font-size: 9px;
   font-weight: 700;
@@ -3283,10 +3460,7 @@ html.dark .ob-mini-day {
   font-family: "Lato", sans-serif;
   transition: all 0.3s;
 }
-html.dark .ob-raw-ingredient {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
-  color: #c8d8e0;
-}
+
 .ob-raw-ingredient.ob-merging {
   opacity: 0;
   transform: scale(0.5);
@@ -3310,11 +3484,7 @@ html.dark .ob-raw-ingredient {
   animation: slideIn 0.3s ease forwards;
   opacity: 0;
 }
-html.dark .ob-combined-item {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #e8e0f0;
-}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -3460,9 +3630,7 @@ html.dark .ob-combined-item {
   padding-top: 16px;
   border-top: 1px solid #f0e0d0;
 }
-html.dark .ob-nav {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
+
 .ob-nav-btn {
   background: none;
   border: 1.5px solid #e0cfc0;
@@ -3482,13 +3650,7 @@ html.dark .ob-nav {
   opacity: 0.3;
   cursor: not-allowed;
 }
-html.dark .ob-nav-btn {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #e8e0f0;
-}
-html.dark .ob-nav-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--bg) 40%, white 60%);
-}
+
 .ob-nav-done {
   background: var(--primary);
   color: white;
@@ -3519,12 +3681,6 @@ html.dark .ob-nav-btn:hover:not(:disabled) {
 .ob-dot-btn.active {
   background: var(--primary);
   transform: scale(1.3);
-}
-html.dark .ob-dot-btn {
-  background: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
-html.dark .ob-dot-btn.active {
-  background: var(--primary);
 }
 
 @media (max-width: 640px) {
@@ -3564,9 +3720,6 @@ html.dark .ob-dot-btn.active {
   overflow: hidden;
   background: var(--bg);
 }
-html.dark .ob-app-layout-mini {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
 
 .ob-sidebar-mini {
   width: 100px;
@@ -3578,9 +3731,6 @@ html.dark .ob-app-layout-mini {
   flex-shrink: 0;
   font-size: 9px;
   font-family: "Lato", sans-serif;
-}
-html.dark .ob-sidebar-mini {
-  background: color-mix(in srgb, var(--bg) 80%, white 20%);
 }
 
 .ob-sidebar-label-mini {
@@ -3601,9 +3751,7 @@ html.dark .ob-sidebar-mini {
   text-overflow: ellipsis;
   transition: background 0.15s;
 }
-html.dark .ob-sidebar-item {
-  color: #c8d8e0;
-}
+
 .ob-sidebar-item.active {
   background: var(--primary);
   color: white;
@@ -3612,9 +3760,6 @@ html.dark .ob-sidebar-item {
   border: none;
   border-top: 1px solid #e8d8c4;
   margin: 3px 0;
-}
-html.dark .ob-sidebar-divider {
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 
 .ob-main-mini {
@@ -3636,10 +3781,6 @@ html.dark .ob-sidebar-divider {
   border-radius: 6px;
   padding: 4px 6px;
   flex-shrink: 0;
-}
-html.dark .ob-save-bar-mini {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 
 .ob-save-input-mini {
@@ -3676,10 +3817,6 @@ html.dark .ob-save-bar-mini {
   display: flex;
   flex-direction: column;
 }
-html.dark .ob-card-mini-full {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
 
 .ob-card-mini-image {
   height: 32px;
@@ -3698,9 +3835,6 @@ html.dark .ob-card-mini-full {
   color: var(--primary);
   font-family: "Playfair Display", serif;
   margin-bottom: 3px;
-}
-html.dark .ob-card-mini-title {
-  color: #e8e0f0;
 }
 .ob-card-mini-tags {
   display: flex;
@@ -3738,10 +3872,6 @@ html.dark .ob-card-mini-title {
     opacity 0.3s,
     transform 0.3s;
 }
-html.dark .ob-recipe-card-mini {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
 .ob-recipe-card-mini.ob-pop-in {
   opacity: 1;
   transform: scale(1) translateY(0);
@@ -3754,10 +3884,6 @@ html.dark .ob-recipe-card-mini {
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 6px;
-}
-html.dark .ob-scroll-card-full {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 .ob-scroll-card-image {
   width: 100%;
@@ -3783,15 +3909,9 @@ html.dark .ob-scroll-card-full {
   color: var(--primary);
   margin-bottom: 2px;
 }
-html.dark .ob-scroll-card-title {
-  color: #e8e0f0;
-}
 .ob-scroll-card-meta {
   font-size: 9px;
   color: #a65a6e;
-}
-html.dark .ob-scroll-card-meta {
-  color: #a0b8c0;
 }
 
 /* Collections animation */
@@ -3813,11 +3933,6 @@ html.dark .ob-scroll-card-meta {
   color: var(--primary);
   font-family: "Lato", sans-serif;
   transition: all 0.3s;
-}
-html.dark .ob-recipe-card-chip {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-  color: #e8e0f0;
 }
 .ob-chip-emoji {
   font-size: 14px;
@@ -3878,10 +3993,6 @@ html.dark .ob-recipe-card-chip {
   width: 130px;
   text-align: center;
 }
-html.dark .ob-compare-card-mini {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
 .ob-compare-image {
   width: 100%;
   height: 50px;
@@ -3898,9 +4009,6 @@ html.dark .ob-compare-card-mini {
   color: var(--primary);
   padding: 6px 8px 2px;
 }
-html.dark .ob-compare-card-title {
-  color: #e8e0f0;
-}
 .ob-compare-result {
   background: white;
   border: 1.5px solid #e8d8c4;
@@ -3909,10 +4017,6 @@ html.dark .ob-compare-card-title {
   width: 100%;
   max-width: 300px;
   animation: slideIn 0.3s ease forwards;
-}
-html.dark .ob-compare-result {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
 }
 .ob-compare-result-label {
   font-size: 9px;
@@ -3927,9 +4031,6 @@ html.dark .ob-compare-result {
   color: #6b4a5e;
   line-height: 1.6;
   font-style: italic;
-}
-html.dark .ob-compare-result-text {
-  color: #a0b8c0;
 }
 
 /* Grocery layout */
@@ -3960,10 +4061,6 @@ html.dark .ob-compare-result-text {
     opacity 0.3s,
     transform 0.3s;
 }
-html.dark .ob-recipe-stack {
-  background: color-mix(in srgb, var(--bg) 70%, white 30%);
-  border-color: color-mix(in srgb, var(--bg) 50%, white 50%);
-}
 .ob-recipe-stack.ob-merging {
   opacity: 0.5;
   filter: blur(0.5px);
@@ -3981,17 +4078,11 @@ html.dark .ob-recipe-stack {
   color: var(--primary);
   font-family: "Lato", sans-serif;
 }
-html.dark .ob-stack-name {
-  color: #e8e0f0;
-}
 .ob-stack-ingredient {
   font-size: 9px;
   color: #a65a6e;
   padding: 1px 0;
   font-family: "Lato", sans-serif;
-}
-html.dark .ob-stack-ingredient {
-  color: #a0b8c0;
 }
 .ob-grocery-arrow {
   font-size: 20px;
@@ -4047,12 +4138,6 @@ html.dark .ob-stack-ingredient {
 .ob-social-icon:hover {
   color: var(--primary);
   transform: scale(1.15);
-}
-html.dark .ob-social-icon {
-  color: #a0b8c0;
-}
-html.dark .ob-social-icon:hover {
-  color: var(--primary);
 }
 
 /* Welcome slide vertical centering */
@@ -4316,4 +4401,370 @@ html.dark .ob-social-icon:hover {
   .overlay-icons {
     display: none;
   }
+}
+
+/* ── Auth Modal ── */
+.auth-modal {
+  max-width: 440px;
+}
+.auth-modal-body {
+  gap: 16px !important;
+}
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f5ede3;
+  border-radius: 10px;
+  padding: 4px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Lato", sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: none;
+  color: #6b4a5e;
+}
+.auth-tab:hover {
+  color: var(--primary);
+}
+.auth-tab.active {
+  background: var(--primary);
+  color: white;
+}
+.google-auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid #e0cfc0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Lato", sans-serif;
+  color: #3a2a38;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.google-auth-btn:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(94, 68, 90, 0.12);
+  transform: scale(1.01);
+}
+.google-auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #c4a898;
+  font-size: 12px;
+  font-weight: 600;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #e0cfc0;
+}
+.auth-field {
+  margin-bottom: 12px;
+}
+.auth-field .form-label {
+  margin-bottom: 6px;
+}
+.auth-password-hint {
+  font-size: 11px;
+  color: #c4a898;
+  margin-top: 4px;
+}
+.auth-submit-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+.auth-reassurance {
+  font-size: 12px;
+  color: #a65a6e;
+  text-align: center;
+  line-height: 1.5;
+}
+/* ── Auth input full width ── */
+.auth-input {
+  width: 100% !important;
+}
+
+/* ── Auth Nudge Banner ── */
+.auth-nudge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 80%, var(--accent))
+  );
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  color: white;
+  box-shadow: 0 2px 12px rgba(94, 68, 90, 0.15);
+}
+.auth-nudge-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.auth-nudge-text {
+  font-size: 13px;
+  line-height: 1.5;
+  flex: 1;
+}
+.auth-nudge-text strong {
+  font-weight: 700;
+}
+.auth-nudge-btn {
+  background: white;
+  color: var(--primary);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  white-space: nowrap;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  flex-shrink: 0;
+}
+.auth-nudge-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.auth-nudge-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.auth-nudge-dismiss:hover {
+  color: white;
+}
+
+/* ── Auth Nudge Modal ── */
+.auth-nudge-modal {
+  max-width: 420px;
+}
+.auth-nudge-modal-body {
+  text-align: center;
+  padding: 32px 28px !important;
+}
+.auth-nudge-modal-emoji {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.auth-nudge-modal-title {
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.auth-nudge-modal-text {
+  font-size: 14px;
+  color: #6b4a5e;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.auth-nudge-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.auth-nudge-modal-signup {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.auth-nudge-modal-signup:hover {
+  background: #c45e30;
+  transform: scale(1.02);
+}
+.auth-nudge-modal-later {
+  background: none;
+  border: none;
+  color: #a65a6e;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  padding: 8px;
+  transition: color 0.2s;
+}
+.auth-nudge-modal-later:hover {
+  color: var(--primary);
+}
+
+/* ── Sidebar Account ── */
+.sidebar-account {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-account-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.sidebar-account-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.sidebar-account-email {
+  font-size: 11px;
+  color: #6b4a5e;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+.sidebar-signout-btn {
+  background: none;
+  border: none;
+  color: #a65a6e;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  padding: 4px 10px 4px 32px;
+  text-align: left;
+  transition: color 0.2s;
+}
+.sidebar-signout-btn:hover {
+  color: var(--accent);
+}
+.sidebar-signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.15s;
+  text-align: left;
+}
+.sidebar-signin-btn:hover {
+  background: var(--accent);
+  color: white;
+  transform: scale(1.02);
+}
+
+/* ── Sidebar account section ── */
+.sidebar-account-card {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar-account-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-account-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: "Lato", sans-serif;
+  text-transform: uppercase;
+}
+.sidebar-account-details {
+  flex: 1;
+  min-width: 0;
+}
+.sidebar-account-email {
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar-account-status {
+  font-size: 9px;
+  color: #4e6646;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.sidebar-signout-btn {
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: 6px;
+  color: #a65a6e;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+  padding: 5px 0;
+  text-align: center;
+  transition: all 0.15s;
+  width: 100%;
+}
+.sidebar-signout-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
 }

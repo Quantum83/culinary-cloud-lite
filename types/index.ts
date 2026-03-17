@@ -30,3 +30,8 @@ export type Toast = {
   message: string;
   id: number;
 };
+
+export type AuthUser = {
+  email: string | null;
+  isAnonymous: boolean;
+};

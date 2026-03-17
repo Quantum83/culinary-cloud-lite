@@ -10,7 +10,9 @@ import CompareModal from "@/components/CompareModal";
 import MealPlanner from "@/components/MealPlanner";
 import SettingsSidebar, { applyThemeVars } from "@/components/SettingsSidebar";
 import OnboardingModal from "@/components/OnboardingModal";
-import type { Recipe, Collection, WeekData, Toast } from "@/types";
+import AuthModal from "@/components/AuthModal";
+import AuthNudge from "@/components/AuthNudge";
+import type { Recipe, Collection, WeekData, Toast, AuthUser } from "@/types";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -19,6 +21,7 @@ export default function Home() {
   const [unscheduled, setUnscheduled] = useState<string[]>([]);
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [hasError, setHasError] = useState("");
   const [selectedRecipeIds, setSelectedRecipeIds] = useState<string[]>([]);
   const [activeCollectionId, setActiveCollectionId] = useState<string | null>(
@@ -36,6 +39,14 @@ export default function Home() {
     "selected",
   );
   const [groceryRegenerate, setGroceryRegenerate] = useState(0);
+
+  // Auth state
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [nudgeBannerDismissed, setNudgeBannerDismissed] = useState(true);
+  const [nudgeModalDismissed, setNudgeModalDismissed] = useState(true);
+  const [showNudgeModal, setShowNudgeModal] = useState(false);
+
   const groceryIngredientSource =
     grocerySource === "planner"
       ? [...unscheduled, ...Object.values(weekData).flat()]
@@ -46,7 +57,6 @@ export default function Home() {
       : recipes
           .filter((r) => selectedRecipeIds.includes(r.id))
           .flatMap((r) => r.ingredients.map((ing) => `[${r.title}] ${ing}`));
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     // Init dark mode
@@ -55,7 +65,6 @@ export default function Home() {
       document.documentElement.classList.add("dark");
       setIsDark(true);
     }
-    // Apply saved theme vars
     const savedTheme = localStorage.getItem(
       savedDark ? "themeDark" : "themeLight",
     );
@@ -64,7 +73,6 @@ export default function Home() {
         applyThemeVars(JSON.parse(savedTheme));
       } catch {}
     } else if (savedDark) {
-      // Apply Deep Ocean default for dark
       applyThemeVars({
         bg: "#17313E",
         primary: "#9BB4C0",
@@ -72,8 +80,66 @@ export default function Home() {
         gold: "#E1D0B3",
       });
     }
+
+    // Load nudge states
+    setNudgeBannerDismissed(
+      localStorage.getItem("authNudgeBannerDismissed") === "true",
+    );
+    setNudgeModalDismissed(
+      localStorage.getItem("authNudgeModalDismissed") === "true",
+    );
+
+    // Check for pending Google auth redirect
+    const pendingAction = localStorage.getItem("pendingAuthAction");
+    if (pendingAction) {
+      localStorage.removeItem("pendingAuthAction");
+      setTimeout(() => {
+        showToast(
+          pendingAction === "signup"
+            ? "Account created! Your recipes sync across devices."
+            : "Welcome back!",
+        );
+      }, 1000);
+    }
+
+    // Auth state listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          email: session.user.email ?? null,
+          isAnonymous: session.user.is_anonymous ?? true,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
     initSession();
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  // Nudge modal trigger
+  useEffect(() => {
+    if (
+      user?.isAnonymous &&
+      recipes.length >= 10 &&
+      !nudgeModalDismissed &&
+      !isAuthModalOpen &&
+      !isInitialLoading
+    ) {
+      const timer = setTimeout(() => setShowNudgeModal(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [
+    recipes.length,
+    user?.isAnonymous,
+    nudgeModalDismissed,
+    isInitialLoading,
+    isAuthModalOpen,
+  ]);
 
   function toggleDark() {
     const next = !isDark;
@@ -111,7 +177,6 @@ export default function Home() {
       await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
     } catch (err) {
       console.error("Session init failed:", err);
-      // optionally show a toast or error state here
     } finally {
       setIsInitialLoading(false);
     }
@@ -146,6 +211,59 @@ export default function Home() {
       () => setToasts((prev) => prev.filter((t) => t.id !== id)),
       3000,
     );
+  }
+
+  async function handleAuthSuccess(action: "signup" | "signin") {
+    setIsAuthModalOpen(false);
+
+    // Refresh user state from server
+    const {
+      data: { user: updatedUser },
+    } = await supabase.auth.getUser();
+    if (updatedUser) {
+      setUser({
+        email: updatedUser.email ?? null,
+        isAnonymous: updatedUser.is_anonymous ?? false,
+      });
+    }
+
+    if (action === "signup") {
+      showToast("Account created! Your recipes sync across devices.");
+    } else {
+      showToast("Welcome back!");
+      setRecipes([]);
+      setCollections([]);
+      setWeekData({});
+      setUnscheduled([]);
+      setSelectedRecipeIds([]);
+      await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
+    }
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    await supabase.auth.signInAnonymously();
+    setRecipes([]);
+    setCollections([]);
+    setWeekData({});
+    setUnscheduled([]);
+    setSelectedRecipeIds([]);
+    setActiveCollectionId(null);
+    setIsPlannerActive(false);
+    setIsGroceryOpen(false);
+    await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
+    showToast("Signed out successfully");
+  }
+
+  function dismissNudgeBanner() {
+    setNudgeBannerDismissed(true);
+    localStorage.setItem("authNudgeBannerDismissed", "true");
+  }
+
+  function dismissNudgeModal() {
+    setShowNudgeModal(false);
+    setNudgeModalDismissed(true);
+    localStorage.setItem("authNudgeModalDismissed", "true");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -280,6 +398,12 @@ export default function Home() {
     setUnscheduled(newUnscheduled);
   }
 
+  const showNudgeBanner =
+    user?.isAnonymous &&
+    recipes.length >= 3 &&
+    !nudgeBannerDismissed &&
+    !isPlannerActive;
+
   return (
     <>
       <div className="app-layout">
@@ -290,6 +414,7 @@ export default function Home() {
           isGroceryOpen={isGroceryOpen}
           isDark={isDark}
           grocerySource={grocerySource}
+          user={user}
           onSelect={(id) => {
             setActiveCollectionId(id);
             setIsPlannerActive(false);
@@ -308,6 +433,8 @@ export default function Home() {
           onCollectionsUpdated={setCollections}
           onSettingsOpen={() => setIsSettingsOpen(true)}
           onDarkToggle={toggleDark}
+          onAuthClick={() => setIsAuthModalOpen(true)}
+          onSignOut={handleSignOut}
         />
 
         <div className="main-content-wrapper">
@@ -345,6 +472,14 @@ export default function Home() {
                   {hasError && <p className="error-msg">{hasError}</p>}
                 </form>
               </div>
+            )}
+
+            {showNudgeBanner && (
+              <AuthNudge
+                recipeCount={recipes.length}
+                onSignUp={() => setIsAuthModalOpen(true)}
+                onDismiss={dismissNudgeBanner}
+              />
             )}
 
             <h2 className="recipes-header">
@@ -418,6 +553,51 @@ export default function Home() {
           recipes={recipes.filter((r) => selectedRecipeIds.includes(r.id))}
           onClose={() => setIsComparing(false)}
         />
+      )}
+
+      {isAuthModalOpen && (
+        <AuthModal
+          isAnonymous={user?.isAnonymous ?? true}
+          onClose={() => setIsAuthModalOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      )}
+
+      {showNudgeModal && (
+        <div className="modal-overlay">
+          <div
+            className="modal auth-nudge-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="auth-nudge-modal-body">
+              <div className="auth-nudge-modal-emoji">🎉</div>
+              <h2 className="auth-nudge-modal-title">
+                You&apos;ve saved {recipes.length} recipes!
+              </h2>
+              <p className="auth-nudge-modal-text">
+                Your recipes are saved locally and won&apos;t disappear. Create
+                a free account to access them on any device.
+              </p>
+              <div className="auth-nudge-modal-actions">
+                <button
+                  className="auth-nudge-modal-signup"
+                  onClick={() => {
+                    dismissNudgeModal();
+                    setIsAuthModalOpen(true);
+                  }}
+                >
+                  Create Free Account
+                </button>
+                <button
+                  className="auth-nudge-modal-later"
+                  onClick={dismissNudgeModal}
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="toast-container">

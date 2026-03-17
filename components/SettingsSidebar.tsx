@@ -163,7 +163,7 @@ function ThemeSection({
     { key: "bg", label: "Background" },
     { key: "primary", label: "Primary" },
     { key: "accent", label: "Accent" },
-    { key: "gold", label: "Gold" },
+    { key: "gold", label: "Secondary" },
   ];
 
   return (
