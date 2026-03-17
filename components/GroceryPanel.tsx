@@ -48,8 +48,8 @@ export default function GroceryPanel({
     setIsLoading(true);
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch("/api/recipes", {
-        method: "PUT",
+      const res = await fetch("/api/grocery", {
+        method: "POST",
         headers,
         body: JSON.stringify({ ingredients: ingredientSource }),
       });

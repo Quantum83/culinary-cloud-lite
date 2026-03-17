@@ -1,22 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseForUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "");
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: token ? `Bearer ${token}` : "" } } },
-  );
-}
-
-function getSupabaseServer() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-}
+import { getSupabaseForUser, getSupabaseServer } from "@/lib/supabase-server";
 
 async function getUserId(req: NextRequest): Promise<string | null> {
   const supabase = getSupabaseForUser(req);
@@ -602,43 +587,4 @@ export async function DELETE(req: NextRequest) {
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
-}
-
-export async function PUT(req: NextRequest) {
-  const { ingredients } = await req.json();
-  if (!ingredients?.length)
-    return NextResponse.json(
-      { error: "No ingredients provided" },
-      { status: 400 },
-    );
-
-  try {
-    const combined = await callClaude(
-      `You are a precise cooking assistant. Combine these ingredients from multiple recipes into a smart grocery list.
-
-Each ingredient is prefixed with the recipe title in brackets like [Recipe Title].
-
-For each unique ingredient:
-1. Add up all quantities mathematically into a single total
-2. Show a breakdown per recipe using the recipe title as the hint (2-3 words max from the title)
-
-Return a JSON array where each item is formatted exactly like:
-"TOTAL_AMOUNT INGREDIENT_NAME | breakdown: AMOUNT (RECIPE_HINT), AMOUNT (RECIPE_HINT)"
-
-Rules:
-- Convert to consistent units before adding
-- Use practical units in the total
-- Recipe hint should be 2-3 words max from the actual recipe title
-- Remove exact duplicates
-- Reply with ONLY the JSON array
-
-Ingredients:
-${ingredients.join("\n")}`,
-      2000,
-    );
-    const result = JSON.parse(combined.replace(/```json|```/g, "").trim());
-    return NextResponse.json({ ingredients: result });
-  } catch {
-    return NextResponse.json({ ingredients });
-  }
 }

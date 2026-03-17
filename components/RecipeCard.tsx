@@ -3,26 +3,8 @@
 import { useState } from "react";
 import { getAuthHeaders } from "@/lib/supabase";
 import TagInput from "./TagInput";
-
-type Recipe = {
-  id: string;
-  title: string;
-  ingredients: string[];
-  instructions: string[];
-  image_url: string | null;
-  source_url: string;
-  source_domain: string | null;
-  tags: string[];
-  notes: string | null;
-  created_at: string;
-  prep_time: string | null;
-  cook_time: string | null;
-  total_time: string | null;
-  recipe_yield: string | null;
-  description: string | null;
-  video_url: string | null;
-  video_id: string | null;
-};
+import type { Recipe } from "@/types";
+import { scaleIngredient } from "@/lib/scale";
 
 function VideoPlayer({
   videoId,
@@ -99,35 +81,6 @@ function VideoPlayer({
         </button>
       </div>
     </div>
-  );
-}
-
-function scaleIngredient(ingredient: string, scale: number): string {
-  if (scale === 1) return ingredient;
-  return ingredient.replace(
-    /(\d+\/\d+|\d+\.\d+|\d+)/g,
-    (match, _p1, offset, str) => {
-      // skip if followed by °F or °C (temperatures)
-      const after = str.slice(offset + match.length);
-      if (/^\s*°[FC]/i.test(after)) return match;
-      // skip if the number is a temperature value like 110°F in parentheses
-      if (/°[FC]/i.test(str.slice(offset, offset + match.length + 5)))
-        return match;
-      // skip standalone time words
-      if (/^\s*(minutes?|hours?|seconds?)/i.test(after)) return match;
-
-      if (match.includes("/")) {
-        const [num, den] = match.split("/").map(Number);
-        const result = (num / den) * scale;
-        return result % 1 === 0
-          ? String(result)
-          : result.toFixed(1).replace(/\.0$/, "");
-      }
-      const result = parseFloat(match) * scale;
-      return result % 1 === 0
-        ? String(result)
-        : result.toFixed(1).replace(/\.0$/, "");
-    },
   );
 }
 

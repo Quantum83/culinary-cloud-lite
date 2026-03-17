@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { getAuthHeaders } from "@/lib/supabase";
-
-type Collection = {
-  id: string;
-  name: string;
-  recipe_ids: string[];
-};
+import type { Collection } from "@/types";
 
 type CollectionsSidebarProps = {
   collections: Collection[];

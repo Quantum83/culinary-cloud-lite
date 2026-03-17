@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getAuthHeaders } from "@/lib/supabase";
+import type { Recipe, WeekData } from "@/types";
 
 const DAYS = [
   "Monday",
@@ -12,16 +13,6 @@ const DAYS = [
   "Saturday",
   "Sunday",
 ];
-
-type Recipe = {
-  id: string;
-  title: string;
-  image_url: string | null;
-  source_url: string;
-  ingredients: string[];
-};
-
-type WeekData = Record<string, string[]>;
 
 type MealPlannerProps = {
   recipes: Recipe[];

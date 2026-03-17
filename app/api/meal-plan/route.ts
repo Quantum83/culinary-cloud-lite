@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseForUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "");
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: token ? `Bearer ${token}` : "" } } },
-  );
-}
+import { getSupabaseForUser } from "@/lib/supabase-server";
 
 export async function GET(req: NextRequest) {
   const supabase = getSupabaseForUser(req);

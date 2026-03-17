@@ -10,29 +10,7 @@ import CompareModal from "@/components/CompareModal";
 import MealPlanner from "@/components/MealPlanner";
 import SettingsSidebar, { applyThemeVars } from "@/components/SettingsSidebar";
 import OnboardingModal from "@/components/OnboardingModal";
-
-type Recipe = {
-  id: string;
-  title: string;
-  ingredients: string[];
-  instructions: string[];
-  image_url: string | null;
-  source_url: string;
-  source_domain: string | null;
-  tags: string[];
-  notes: string | null;
-  created_at: string;
-  prep_time: string | null;
-  cook_time: string | null;
-  total_time: string | null;
-  recipe_yield: string | null;
-  description: string | null;
-  video_url: string | null;
-  video_id: string | null;
-};
-type Collection = { id: string; name: string; recipe_ids: string[] };
-type WeekData = Record<string, string[]>;
-type Toast = { message: string; id: number };
+import type { Recipe, Collection, WeekData, Toast } from "@/types";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -68,6 +46,7 @@ export default function Home() {
       : recipes
           .filter((r) => selectedRecipeIds.includes(r.id))
           .flatMap((r) => r.ingredients.map((ing) => `[${r.title}] ${ing}`));
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     // Init dark mode
@@ -124,11 +103,18 @@ export default function Home() {
   }
 
   async function initSession() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) await supabase.auth.signInAnonymously();
-    await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.signInAnonymously();
+      await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
+    } catch (err) {
+      console.error("Session init failed:", err);
+      // optionally show a toast or error state here
+    } finally {
+      setIsInitialLoading(false);
+    }
   }
 
   async function fetchRecipes() {
@@ -389,6 +375,8 @@ export default function Home() {
                 unscheduled={unscheduled}
                 onWeekDataChange={handlePlannerChange}
               />
+            ) : isInitialLoading ? (
+              <p className="empty-msg">Loading your recipes...</p>
             ) : (
               <RecipeList
                 recipes={recipes}

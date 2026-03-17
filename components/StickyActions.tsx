@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-type Recipe = { id: string; ingredients: string[]; title: string };
-type Collection = { id: string; name: string; recipe_ids: string[] };
+import type { Recipe, Collection } from "@/types";
 
 type StickyActionsProps = {
   selectedRecipeIds: string[];

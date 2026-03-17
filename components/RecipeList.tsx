@@ -4,26 +4,7 @@ import { useState } from "react";
 import RecipeCard from "./RecipeCard";
 import MultiSelectDropdown from "./MultiSelectDropdown";
 import RecipeDetailModal from "./RecipeDetailModal";
-
-type Recipe = {
-  id: string;
-  title: string;
-  ingredients: string[];
-  instructions: string[];
-  image_url: string | null;
-  source_url: string;
-  source_domain: string | null;
-  tags: string[];
-  notes: string | null;
-  created_at: string;
-  prep_time: string | null;
-  cook_time: string | null;
-  total_time: string | null;
-  recipe_yield: string | null;
-  description: string | null;
-  video_url: string | null;
-  video_id: string | null;
-};
+import type { Recipe } from "@/types";
 
 type RecipeListProps = {
   recipes: Recipe[];
