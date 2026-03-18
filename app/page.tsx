@@ -15,6 +15,7 @@ import AuthNudge from "@/components/AuthNudge";
 import type { Recipe, Collection, WeekData, Toast, AuthUser } from "@/types";
 import MobileTopBar from "@/components/MobileTopBar";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import KofiButton from "@/components/KofiButton";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -679,9 +680,9 @@ export default function Home() {
             href="https://insigh.to/b/culinary-cloud-20"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Feedback"
+            aria-label="Suggest a feature"
             className="footer-icon"
-            title="Give feedback"
+            title="Suggest a feature"
           >
             <svg
               viewBox="0 0 24 24"
@@ -693,14 +694,13 @@ export default function Home() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </a>
         </div>
       </footer>
       <OnboardingModal />
+      <KofiButton />
     </>
   );
 }

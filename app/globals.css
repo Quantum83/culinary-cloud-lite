@@ -4156,6 +4156,87 @@ html.dark .submit-btn:hover {
   justify-content: center;
 }
 
+/* ── Ko-fi Button ── */
+.kofi-floating-btn {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ff5e5b;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(255, 94, 91, 0.35);
+  z-index: 80;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.kofi-floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(255, 94, 91, 0.45);
+}
+.kofi-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 20, 30, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.kofi-panel {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  background: #f9f9f9;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+}
+.kofi-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+  z-index: 10;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.kofi-close:hover {
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .kofi-floating-btn {
+    bottom: 56px;
+    right: 12px;
+    width: 42px;
+    height: 42px;
+  }
+  .kofi-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .kofi-panel {
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 80vh;
+  }
+}
+
 /* ── Footer ── */
 .footer {
   position: fixed;

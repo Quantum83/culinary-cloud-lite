@@ -691,7 +691,7 @@ const SLIDES = [
     emoji: "🚀",
     title: "More Coming Soon",
     subtitle:
-      "We're constantly adding new features. Have an idea or found a bug? We'd love to hear from you.",
+      "I'm constantly adding new features that users request. Have an idea or found a bug? I'd love to hear from you.",
     animation: null,
     isLast: true,
   },
@@ -760,7 +760,7 @@ export default function OnboardingModal() {
                 rel="noopener noreferrer"
                 className="ob-feedback-btn"
               >
-                💬 Give Feedback
+                💬 Suggest a Feature
               </a>
               <div className="ob-socials">
                 <a
