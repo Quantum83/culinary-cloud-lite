@@ -22,6 +22,8 @@ type CollectionsSidebarProps = {
   onDarkToggle: () => void;
   onAuthClick: () => void;
   onSignOut: () => void;
+  isMobileOpen: boolean;
+  onMobileClose: () => void;
 };
 
 export default function CollectionsSidebar({
@@ -42,12 +44,13 @@ export default function CollectionsSidebar({
   onDarkToggle,
   onAuthClick,
   onSignOut,
+  isMobileOpen,
+  onMobileClose,
 }: CollectionsSidebarProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isSourceOpen, setIsSourceOpen] = useState(false);
-
   async function createCollection() {
     if (!newName.trim()) return;
     const headers = await getAuthHeaders();
@@ -76,7 +79,9 @@ export default function CollectionsSidebar({
   }
 
   return (
-    <aside className="collections-sidebar">
+    <aside
+      className={`collections-sidebar ${isMobileOpen ? "mobile-open" : ""}`}
+    >
       <p className="sidebar-label">Collections</p>
 
       <ul className="collections-list">
@@ -269,12 +274,24 @@ export default function CollectionsSidebar({
               </div>
             </div>
           </div>
-          <button className="sidebar-signout-btn" onClick={onSignOut}>
+          <button
+            className="sidebar-signout-btn"
+            onClick={() => {
+              onSignOut();
+              onMobileClose();
+            }}
+          >
             Sign Out
           </button>
         </div>
       ) : (
-        <button className="sidebar-signin-btn" onClick={onAuthClick}>
+        <button
+          className="sidebar-signin-btn"
+          onClick={() => {
+            onAuthClick();
+            onMobileClose();
+          }}
+        >
           <span>🔐</span>
           Sign In / Sign Up
         </button>

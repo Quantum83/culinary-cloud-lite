@@ -13,6 +13,8 @@ import OnboardingModal from "@/components/OnboardingModal";
 import AuthModal from "@/components/AuthModal";
 import AuthNudge from "@/components/AuthNudge";
 import type { Recipe, Collection, WeekData, Toast, AuthUser } from "@/types";
+import MobileTopBar from "@/components/MobileTopBar";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -39,6 +41,7 @@ export default function Home() {
     "selected",
   );
   const [groceryRegenerate, setGroceryRegenerate] = useState(0);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Auth state
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -46,7 +49,11 @@ export default function Home() {
   const [nudgeBannerDismissed, setNudgeBannerDismissed] = useState(true);
   const [nudgeModalDismissed, setNudgeModalDismissed] = useState(true);
   const [showNudgeModal, setShowNudgeModal] = useState(false);
-
+  useSwipeGesture(
+    isMobileSidebarOpen,
+    () => setIsMobileSidebarOpen(true),
+    () => setIsMobileSidebarOpen(false),
+  );
   const groceryIngredientSource =
     grocerySource === "planner"
       ? [...unscheduled, ...Object.values(weekData).flat()]
@@ -406,6 +413,18 @@ export default function Home() {
 
   return (
     <>
+      <div
+        className={`mobile-sidebar-overlay ${isMobileSidebarOpen ? "active" : ""}`}
+        onClick={() => setIsMobileSidebarOpen(false)}
+      />
+
+      <MobileTopBar
+        onMenuOpen={() => setIsMobileSidebarOpen(true)}
+        onAuthClick={() => setIsAuthModalOpen(true)}
+        user={user}
+        isDark={isDark}
+      />
+
       <div className="app-layout">
         <CollectionsSidebar
           collections={collections}
@@ -415,6 +434,8 @@ export default function Home() {
           isDark={isDark}
           grocerySource={grocerySource}
           user={user}
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={() => setIsMobileSidebarOpen(false)}
           onSelect={(id) => {
             setActiveCollectionId(id);
             setIsPlannerActive(false);

@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  themeColor: "#5e445a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "Culinary Cloud | Free AI Recipe Manager & Cookbook",
@@ -8,6 +16,15 @@ export const metadata: Metadata = {
   keywords:
     "recipe manager, recipe organizer, save recipes, recipe comparison, meal planner, grocery list, AI cookbook, recipe saver, online cookbook",
   metadataBase: new URL("https://www.culinary-cloud.com"),
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Culinary Cloud",
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Culinary Cloud | Free AI Recipe Manager & Cookbook",
     description:
