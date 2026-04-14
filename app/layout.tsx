@@ -1,4 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { AuthProvider } from "./providers/AuthProvider";
+import { RecipesProvider } from "./providers/RecipesProvider";
+import { CollectionsProvider } from "./providers/CollectionsProvider";
+import { MealPlanProvider } from "./providers/MealPlanProvider";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -16,15 +20,6 @@ export const metadata: Metadata = {
   keywords:
     "recipe manager, recipe organizer, save recipes, recipe comparison, meal planner, grocery list, AI cookbook, recipe saver, online cookbook",
   metadataBase: new URL("https://www.culinary-cloud.com"),
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Culinary Cloud",
-  },
-  icons: {
-    apple: "/icons/apple-touch-icon.png",
-  },
   openGraph: {
     title: "Culinary Cloud | Free AI Recipe Manager & Cookbook",
     description:
@@ -60,7 +55,15 @@ export default function RootLayout({
           data-cf-beacon='{"token": "1762e98699a44b7db19bd9188fcef9fe"}'
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <RecipesProvider>
+            <CollectionsProvider>
+              <MealPlanProvider>{children}</MealPlanProvider>
+            </CollectionsProvider>
+          </RecipesProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

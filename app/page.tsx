@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase, getAuthHeaders } from "@/lib/supabase";
 import RecipeList from "@/components/RecipeList";
 import CollectionsSidebar from "@/components/CollectionsSidebar";
 import StickyActions from "@/components/StickyActions";
@@ -12,21 +11,19 @@ import SettingsSidebar, { applyThemeVars } from "@/components/SettingsSidebar";
 import OnboardingModal from "@/components/OnboardingModal";
 import AuthModal from "@/components/AuthModal";
 import AuthNudge from "@/components/AuthNudge";
-import type { Recipe, Collection, WeekData, Toast, AuthUser } from "@/types";
+import type { Toast } from "@/types";
 import MobileTopBar from "@/components/MobileTopBar";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import KofiButton from "@/components/KofiButton";
+import { useAuth } from "@/hooks/useAuth";
+import { useRecipes } from "@/hooks/useRecipes";
+import { useCollections } from "@/hooks/useCollections";
+import { useMealPlan } from "@/hooks/useMealPlan";
 
 export default function Home() {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [weekData, setWeekData] = useState<WeekData>({});
-  const [unscheduled, setUnscheduled] = useState<string[]>([]);
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [hasError, setHasError] = useState("");
-  const [selectedRecipeIds, setSelectedRecipeIds] = useState<string[]>([]);
   const [activeCollectionId, setActiveCollectionId] = useState<string | null>(
     null,
   );
@@ -44,17 +41,64 @@ export default function Home() {
   const [groceryRegenerate, setGroceryRegenerate] = useState(0);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Auth state
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [nudgeBannerDismissed, setNudgeBannerDismissed] = useState(true);
-  const [nudgeModalDismissed, setNudgeModalDismissed] = useState(true);
-  const [showNudgeModal, setShowNudgeModal] = useState(false);
+  // Auth from context
+  const {
+    user,
+    isAuthModalOpen,
+    setIsAuthModalOpen,
+    showNudgeModal,
+    nudgeBannerDismissed,
+    nudgeModalDismissed,
+    handleAuthSuccess: authSuccess,
+    handleSignOut: signOut,
+    dismissNudgeBanner,
+    dismissNudgeModal,
+    setShowNudgeModal,
+  } = useAuth();
+
+  // Recipes from context
+  const {
+    recipes,
+    selectedRecipeIds,
+    isInitialLoading,
+    addRecipe,
+    deleteRecipe,
+    updateRecipeTags,
+    updateRecipeNotes,
+    toggleSelectRecipe,
+    clearSelection,
+    fetchRecipes,
+    setRecipes,
+  } = useRecipes();
+
+  // Collections from context
+  const {
+    collections,
+    fetchCollections,
+    createCollection,
+    updateCollection,
+    removeRecipeFromCollections,
+    setCollections,
+  } = useCollections();
+
+  // Meal plan from context
+  const {
+    weekData,
+    unscheduled,
+    fetchMealPlan,
+    saveMealPlan,
+    updateWeekData,
+    addToUnscheduled,
+    setWeekData,
+    setUnscheduled,
+  } = useMealPlan();
+
   useSwipeGesture(
     isMobileSidebarOpen,
     () => setIsMobileSidebarOpen(true),
     () => setIsMobileSidebarOpen(false),
   );
+
   const groceryIngredientSource =
     grocerySource === "planner"
       ? [...unscheduled, ...Object.values(weekData).flat()]
@@ -65,6 +109,27 @@ export default function Home() {
       : recipes
           .filter((r) => selectedRecipeIds.includes(r.id))
           .flatMap((r) => r.ingredients.map((ing) => `[${r.title}] ${ing}`));
+
+  // Nudge modal trigger
+  useEffect(() => {
+    if (
+      user?.isAnonymous &&
+      recipes.length >= 10 &&
+      !nudgeModalDismissed &&
+      !isAuthModalOpen &&
+      !isInitialLoading
+    ) {
+      const timer = setTimeout(() => setShowNudgeModal(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [
+    recipes.length,
+    user?.isAnonymous,
+    nudgeModalDismissed,
+    isInitialLoading,
+    isAuthModalOpen,
+    setShowNudgeModal,
+  ]);
 
   useEffect(() => {
     // Init dark mode
@@ -89,14 +154,6 @@ export default function Home() {
       });
     }
 
-    // Load nudge states
-    setNudgeBannerDismissed(
-      localStorage.getItem("authNudgeBannerDismissed") === "true",
-    );
-    setNudgeModalDismissed(
-      localStorage.getItem("authNudgeModalDismissed") === "true",
-    );
-
     // Check for pending Google auth redirect
     const pendingAction = localStorage.getItem("pendingAuthAction");
     if (pendingAction) {
@@ -109,45 +166,7 @@ export default function Home() {
         );
       }, 1000);
     }
-
-    // Auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser({
-          email: session.user.email ?? null,
-          isAnonymous: session.user.is_anonymous ?? true,
-        });
-      } else {
-        setUser(null);
-      }
-    });
-
-    initSession();
-
-    return () => subscription.unsubscribe();
   }, []);
-
-  // Nudge modal trigger
-  useEffect(() => {
-    if (
-      user?.isAnonymous &&
-      recipes.length >= 10 &&
-      !nudgeModalDismissed &&
-      !isAuthModalOpen &&
-      !isInitialLoading
-    ) {
-      const timer = setTimeout(() => setShowNudgeModal(true), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [
-    recipes.length,
-    user?.isAnonymous,
-    nudgeModalDismissed,
-    isInitialLoading,
-    isAuthModalOpen,
-  ]);
 
   function toggleDark() {
     const next = !isDark;
@@ -176,42 +195,6 @@ export default function Home() {
     }
   }
 
-  async function initSession() {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) await supabase.auth.signInAnonymously();
-      await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
-    } catch (err) {
-      console.error("Session init failed:", err);
-    } finally {
-      setIsInitialLoading(false);
-    }
-  }
-
-  async function fetchRecipes() {
-    const headers = await getAuthHeaders();
-    const res = await fetch("/api/recipes", { headers });
-    const data = await res.json();
-    if (Array.isArray(data)) setRecipes(data);
-  }
-
-  async function fetchCollections() {
-    const headers = await getAuthHeaders();
-    const res = await fetch("/api/collections", { headers });
-    const data = await res.json();
-    if (Array.isArray(data)) setCollections(data);
-  }
-
-  async function fetchMealPlan() {
-    const headers = await getAuthHeaders();
-    const res = await fetch("/api/meal-plan", { headers });
-    const data = await res.json();
-    if (data.week_data) setWeekData(data.week_data);
-    if (data.unscheduled) setUnscheduled(data.unscheduled);
-  }
-
   function showToast(message: string) {
     const id = Date.now();
     setToasts((prev) => [...prev, { message, id }]);
@@ -222,154 +205,88 @@ export default function Home() {
   }
 
   async function handleAuthSuccess(action: "signup" | "signin") {
-    setIsAuthModalOpen(false);
-
-    // Refresh user state from server
-    const {
-      data: { user: updatedUser },
-    } = await supabase.auth.getUser();
-    if (updatedUser) {
-      setUser({
-        email: updatedUser.email ?? null,
-        isAnonymous: updatedUser.is_anonymous ?? false,
-      });
-    }
+    await authSuccess(action);
 
     if (action === "signup") {
       showToast("Account created! Your recipes sync across devices.");
     } else {
       showToast("Welcome back!");
+      // Clear local state
       setRecipes([]);
       setCollections([]);
       setWeekData({});
       setUnscheduled([]);
-      setSelectedRecipeIds([]);
+      clearSelection();
+      // Refetch everything
       await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
     }
   }
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
-    await supabase.auth.signInAnonymously();
+    await signOut();
+    // Clear local state
     setRecipes([]);
     setCollections([]);
     setWeekData({});
     setUnscheduled([]);
-    setSelectedRecipeIds([]);
+    clearSelection();
     setActiveCollectionId(null);
     setIsPlannerActive(false);
     setIsGroceryOpen(false);
+    // Refetch everything
     await Promise.all([fetchRecipes(), fetchCollections(), fetchMealPlan()]);
     showToast("Signed out successfully");
-  }
-
-  function dismissNudgeBanner() {
-    setNudgeBannerDismissed(true);
-    localStorage.setItem("authNudgeBannerDismissed", "true");
-  }
-
-  function dismissNudgeModal() {
-    setShowNudgeModal(false);
-    setNudgeModalDismissed(true);
-    localStorage.setItem("authNudgeModalDismissed", "true");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
     setHasError("");
-    const headers = await getAuthHeaders();
+
     const autoTagging = localStorage.getItem("autoTagging") !== "false";
     const youtubeExtraction =
       localStorage.getItem("youtubeExtraction") !== "false";
-    const res = await fetch("/api/recipes", {
-      method: "POST",
-      headers: {
-        ...headers,
-        "x-auto-tagging": String(autoTagging),
-        "x-youtube-extraction": String(youtubeExtraction),
-      },
-      body: JSON.stringify({ url }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setHasError(data.error || "Something went wrong");
-    } else if (data._duplicate) {
-      showToast(`You've already saved "${data.title}"`);
-      setUrl("");
+
+    const result = await addRecipe(url, autoTagging, youtubeExtraction);
+
+    if (!result.success) {
+      if (result.duplicate) {
+        showToast(`You've already saved "${result.title}"`);
+        setUrl("");
+      } else {
+        setHasError(result.error || "Something went wrong");
+      }
     } else {
       setUrl("");
-      setRecipes((prev) => [data, ...prev]);
     }
+
     setIsLoading(false);
   }
 
-  async function handleDelete(id: string) {
-    const headers = await getAuthHeaders();
-    const res = await fetch("/api/recipes", {
-      method: "DELETE",
-      headers,
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) {
-      setRecipes((prev) => prev.filter((r) => r.id !== id));
-      setSelectedRecipeIds((prev) => prev.filter((r) => r !== id));
-      setCollections((prev) =>
-        prev.map((c) => ({
-          ...c,
-          recipe_ids: c.recipe_ids.filter((rid) => rid !== id),
-        })),
-      );
-    }
-  }
-
-  function handleSelect(id: string) {
-    setSelectedRecipeIds((prev) =>
-      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id],
-    );
-  }
-
-  function handleTagsUpdated(id: string, tags: string[]) {
-    setRecipes((prev) => prev.map((r) => (r.id === id ? { ...r, tags } : r)));
-  }
-
-  function handleNotesSaved(id: string, notes: string) {
-    setRecipes((prev) => prev.map((r) => (r.id === id ? { ...r, notes } : r)));
+  async function handleDeleteRecipe(id: string) {
+    await deleteRecipe(id);
+    removeRecipeFromCollections(id);
   }
 
   async function handleAddToCollection(collectionId: string) {
     const collection = collections.find((c) => c.id === collectionId);
     if (!collection) return;
+
     const newIds = Array.from(
       new Set([...collection.recipe_ids, ...selectedRecipeIds]),
     );
-    const headers = await getAuthHeaders();
-    const res = await fetch("/api/collections", {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({ id: collectionId, recipe_ids: newIds }),
-    });
-    const data = await res.json();
-    if (!data.error) {
-      setCollections((prev) =>
-        prev.map((c) => (c.id === collectionId ? data : c)),
-      );
-      showToast(
-        `Added ${selectedRecipeIds.length} recipe${selectedRecipeIds.length > 1 ? "s" : ""} to "${collection.name}"`,
-      );
-    }
+
+    await updateCollection(collectionId, newIds);
+
+    showToast(
+      `Added ${selectedRecipeIds.length} recipe${selectedRecipeIds.length > 1 ? "s" : ""} to "${collection.name}"`,
+    );
   }
 
   async function handleCreateAndAddCollection(name: string) {
-    const headers = await getAuthHeaders();
-    const res = await fetch("/api/collections", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ name, recipe_ids: selectedRecipeIds }),
-    });
-    const data = await res.json();
-    if (!data.error) {
-      setCollections((prev) => [...prev, data]);
+    const newCollection = await createCollection(name, selectedRecipeIds);
+
+    if (newCollection) {
       showToast(
         `Created "${name}" with ${selectedRecipeIds.length} recipe${selectedRecipeIds.length > 1 ? "s" : ""}`,
       );
@@ -377,33 +294,12 @@ export default function Home() {
   }
 
   function handleAddToPlanner() {
-    const newUnscheduled = Array.from(
-      new Set([...unscheduled, ...selectedRecipeIds]),
-    );
-    setUnscheduled(newUnscheduled);
+    addToUnscheduled(selectedRecipeIds);
     setIsPlannerActive(true);
-    setSelectedRecipeIds([]);
+    clearSelection();
     showToast(
       `Added ${selectedRecipeIds.length} recipe${selectedRecipeIds.length > 1 ? "s" : ""} to planner`,
     );
-    getAuthHeaders().then((headers) => {
-      fetch("/api/meal-plan", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          week_data: weekData,
-          unscheduled: newUnscheduled,
-        }),
-      });
-    });
-  }
-
-  function handlePlannerChange(
-    newWeekData: WeekData,
-    newUnscheduled: string[],
-  ) {
-    setWeekData(newWeekData);
-    setUnscheduled(newUnscheduled);
   }
 
   const showNudgeBanner =
@@ -522,7 +418,7 @@ export default function Home() {
               onAddToCollection={handleAddToCollection}
               onCreateAndAddCollection={handleCreateAndAddCollection}
               onAddToPlanner={handleAddToPlanner}
-              onDeselectAll={() => setSelectedRecipeIds([])}
+              onDeselectAll={clearSelection}
             />
 
             {isPlannerActive ? (
@@ -530,7 +426,7 @@ export default function Home() {
                 recipes={recipes}
                 weekData={weekData}
                 unscheduled={unscheduled}
-                onWeekDataChange={handlePlannerChange}
+                onWeekDataChange={updateWeekData}
               />
             ) : isInitialLoading ? (
               <p className="empty-msg">Loading your recipes...</p>
@@ -544,10 +440,10 @@ export default function Home() {
                         ?.recipe_ids ?? null)
                     : null
                 }
-                onSelect={handleSelect}
-                onDelete={handleDelete}
-                onTagsUpdated={handleTagsUpdated}
-                onNotesSaved={handleNotesSaved}
+                onSelect={toggleSelectRecipe}
+                onDelete={handleDeleteRecipe}
+                onTagsUpdated={updateRecipeTags}
+                onNotesSaved={updateRecipeNotes}
               />
             )}
           </main>
